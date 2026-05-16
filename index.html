@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="血糖记录">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>血糖记录</title>
+<style>
+:root {
+  --primary: #1a1a2e;
+  --accent: #4f7cff;
+  --accent-light: #eef2ff;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --text-hint: #9ca3af;
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --font: 'PingFang SC', 'Hiragino Sans GB', system-ui, sans-serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #e2e8f0;
+    --accent: #6b8fff;
+    --accent-light: #1e2a4a;
+    --success-light: #052e16;
+    --warning-light: #1c1008;
+    --danger-light: #1c0606;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-hint: #64748b;
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: rgba(255,255,255,0.07);
+    --border-md: rgba(255,255,255,0.13);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Layout */
+#app { display: flex; flex-direction: column; height: 100%; }
+#content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+#content::-webkit-scrollbar { display: none; }
+
+/* Header */
+.header {
+  padding: 56px 20px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.header h1 { font-size: 20px; font-weight: 600; }
+.header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  flex: 1;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 500;
+}
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-top: 12px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Hero button */
+.hero-btn {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  transition: transform 0.15s, opacity 0.15s;
+  -webkit-appearance: none;
+}
+.hero-btn:active { transform: scale(0.97); opacity: 0.9; }
+.hero-icon { font-size: 36px; line-height: 1; }
+.hero-label { font-size: 20px; font-weight: 600; }
+.hero-sub { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+
+/* Secondary button */
+.sec-btn {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s;
+  -webkit-appearance: none;
+}
+.sec-btn:active { transform: scale(0.97); }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.badge-blue { background: var(--accent-light); color: var(--accent); }
+.badge-green { background: var(--success-light); color: var(--success); }
+.badge-yellow { background: var(--warning-light); color: var(--warning); }
+.badge-red { background: var(--danger-light); color: var(--danger); }
+
+/* Alarm card */
+.alarm-card {
+  background: var(--accent-light);
+  border: 1px solid rgba(79,124,255,0.2);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 12px;
+}
+.alarm-card .meal-badge { margin-bottom: 6px; }
+.countdown {
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -1px;
+  margin: 4px 0;
+}
+.remind-time { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+/* Notify banner */
+.notify-banner {
+  background: var(--warning-light);
+  border: 1px solid rgba(217,119,6,0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.notify-banner button {
+  margin-left: auto;
+  padding: 4px 12px;
+  font-size: 12px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-appearance: none;
+}
+
+/* Sliders */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.slider-row label {
+  font-size: 13px;
+  color: var(--text-muted);
+  width: 52px;
+  flex-shrink: 0;
+}
+.slider-row input[type=range] {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--accent);
+}
+.slider-val {
+  font-size: 13px;
+  font-weight: 500;
+  width: 44px;
+  text-align: right;
+}
+
+/* Glucose input */
+.glucose-big {
+  width: 100%;
+  padding: 16px;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  border: 1.5px solid var(--border-md);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.glucose-big:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Range reference */
+.range-ref {
+  font-size: 12px;
+  color: var(--text-hint);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* Meal type grid */
+.meal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.meal-choice {
+  padding: 14px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.15s;
+  -webkit-appearance: none;
+}
+.meal-choice:active, .meal-choice.sel {
+  border: 2px solid var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* History list */
+.day-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 16px 0 6px;
+}
+.record-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+.record-row:last-child { border-bottom: none; }
+.record-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.record-info { flex: 1; }
+.record-name { font-size: 14px; font-weight: 500; }
+.record-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.record-value { text-align: right; }
+.glucose-value { font-size: 18px; font-weight: 600; }
+.glucose-unit { font-size: 11px; color: var(--text-muted); }
+
+/* Stats */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-box {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+}
+.stat-num { font-size: 24px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Mini chart */
+.mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 64px;
+  margin: 12px 0 4px;
+}
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bar-seg {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  min-height: 3px;
+  transition: height 0.3s;
+}
+.bar-txt { font-size: 9px; color: var(--text-muted); }
+.bar-num { font-size: 9px; font-weight: 600; }
+
+/* Modal overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet {
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 24px 20px calc(24px + var(--safe-bottom));
+  width: 100%;
+  max-width: 480px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.overlay.open .sheet { transform: translateY(0); }
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-md);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.sheet-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.sheet-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+/* Select */
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font);
+  margin-bottom: 12px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+input[type=text], textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font);
+  margin-bottom: 12px;
+  -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Primary btn in sheet */
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s;
+  -webkit-appearance: none;
+  font-family: var(--font);
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-ghost {
+  width: 100%;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 4px;
+  -webkit-appearance: none;
+  font-family: var(--font);
+}
+
+/* Feedback hint */
+.feedback {
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  margin: 8px 0;
+}
+.feedback.green { background: var(--success-light); color: var(--success); }
+.feedback.yellow { background: var(--warning-light); color: var(--warning); }
+.feedback.red { background: var(--danger-light); color: var(--danger); }
+
+/* Today card inline record-row action */
+.inline-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border: 1px solid var(--border-md);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-appearance: none;
+}
+
+/* Remind popup */
+.remind-popup .sheet { text-align: center; }
+.remind-emoji { font-size: 48px; margin-bottom: 12px; }
+
+/* Bottom nav */
+.bottom-nav {
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: var(--safe-bottom);
+}
+.nav-item {
+  flex: 1;
+  padding: 10px 0 8px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-hint);
+  transition: color 0.15s;
+  user-select: none;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; margin-top: 2px; }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-hint);
+}
+.empty-icon { font-size: 40px; margin-bottom: 8px; }
+.empty p { font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>血糖记录</h1>
+    <p id="headerDate"></p>
+  </div>
+
+  <!-- Content pages -->
+  <div id="content">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div id="notifyBanner" style="display:none" class="notify-banner">
+        <span>🔔</span>
+        <span>开启通知，到时自动提醒测血糖</span>
+        <button onclick="requestNotify()">开启</button>
+      </div>
+
+      <div id="alarmCard" style="display:none" class="alarm-card">
+        <div class="meal-badge">
+          <span class="badge badge-blue" id="alarmMealTag"></span>
+        </div>
+        <div class="countdown" id="countdown">--:--</div>
+        <div class="remind-time" id="remindAtText"></div>
+        <button class="btn-primary" onclick="openGlucoseSheet('post')" style="margin-bottom:10px">记录餐后血糖</button>
+        <button class="btn-ghost" onclick="cancelAlarm()">取消本次提醒</button>
+      </div>
+
+      <button class="hero-btn" onclick="tapEaten()">
+        <div class="hero-icon">🍚</div>
+        <div>
+          <div class="hero-label">吃完了</div>
+          <div class="hero-sub">记录用餐时间，2小时后提醒测血糖</div>
+        </div>
+      </button>
+
+      <button class="sec-btn" onclick="openGlucoseSheet('fasting')">
+        <span>💉</span> 记录空腹血糖
+      </button>
+
+      <div id="todaySection"></div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page" id="page-history">
+      <div id="historySection"></div>
+    </div>
+
+    <!-- STATS PAGE -->
+    <div class="page" id="page-stats">
+      <div id="statsSection"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchPage('home')" id="nav-home">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">记录</div>
+    </div>
+    <div class="nav-item" onclick="switchPage('history')" id="nav-history">
+      <div class="nav-icon">📋</div>
+      <div class="nav-label">历史</div>
+    </div>
+    <div class="nav-item" onclick="switchPage('stats')" id="nav-stats">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">统计</div>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Meal type picker -->
+<div class="overlay" id="mealSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">这是哪一餐？</div>
+    <div class="sheet-sub" id="mealSheetTime"></div>
+    <div class="meal-grid">
+      <button class="meal-choice" onclick="confirmMealType('早餐')">🌅 早餐</button>
+      <button class="meal-choice" onclick="confirmMealType('午餐')">☀️ 午餐</button>
+      <button class="meal-choice" onclick="confirmMealType('晚餐')">🌙 晚餐</button>
+      <button class="meal-choice" onclick="confirmMealType('加餐')">🍎 加餐</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Food detail -->
+<div class="overlay" id="foodSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">记录餐食内容</div>
+    <div class="sheet-sub">可选，帮助分析血糖与饮食关系</div>
+    <div class="slider-row">
+      <label>主食碳水</label>
+      <input type="range" min="0" max="300" step="10" value="100" id="carbSlider" oninput="updSlider('carbVal',this.value,'g')">
+      <span class="slider-val" id="carbVal">100g</span>
+    </div>
+    <div class="slider-row">
+      <label>蛋白质</label>
+      <input type="range" min="0" max="200" step="10" value="60" id="protSlider" oninput="updSlider('protVal',this.value,'g')">
+      <span class="slider-val" id="protVal">60g</span>
+    </div>
+    <div class="slider-row">
+      <label>蔬菜</label>
+      <input type="range" min="0" max="500" step="50" value="150" id="vegSlider" oninput="updSlider('vegVal',this.value,'g')">
+      <span class="slider-val" id="vegVal">150g</span>
+    </div>
+    <select id="feelingSelect">
+      <option value="">餐后感受（可选）</option>
+      <option>正常</option>
+      <option>偏饱</option>
+      <option>偏少</option>
+      <option>外食高油</option>
+      <option>甜食偏多</option>
+    </select>
+    <input type="text" id="foodNote" placeholder="备注（食物名称等，可跳过）">
+    <button class="btn-primary" onclick="saveFoodAndSetAlarm()">确认并开始计时</button>
+    <button class="btn-ghost" onclick="skipFoodAndSetAlarm()">跳过，直接开始计时</button>
+  </div>
+</div>
+
+<!-- SHEET: Glucose entry -->
+<div class="overlay" id="glucoseSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="glucoseTitle">记录血糖</div>
+    <div class="sheet-sub" id="glucoseSub"></div>
+    <input class="glucose-big" type="number" id="glucoseInput" placeholder="输入血糖值" step="0.1" min="1" max="30" inputmode="decimal">
+    <div class="range-ref" id="glucoseRef"></div>
+    <div id="glucoseFeedback" style="display:none" class="feedback"></div>
+    <button class="btn-primary" style="margin-top:16px" onclick="saveGlucose()">保存</button>
+    <button class="btn-ghost" onclick="closeSheet('glucoseSheet')">取消</button>
+  </div>
+</div>
+
+<!-- SHEET: Remind popup -->
+<div class="overlay remind-popup" id="remindSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="remind-emoji">⏰</div>
+    <div class="sheet-title">该测餐后血糖了</div>
+    <div class="sheet-sub" id="remindInfo"></div>
+    <button class="btn-primary" onclick="closeSheet('remindSheet');openGlucoseSheet('post')">立即记录血糖</button>
+    <button class="btn-ghost" onclick="snooze()">10 分钟后再提醒</button>
+  </div>
+</div>
+
+<script>
+// ─── State & Storage ────────────────────────────────────────────────
+var DB_KEY = 'glucoseRecords_v2';
+var records = [];
+var currentAlarm = null;
+var alarmTimeout = null;
+var snoozeTimeout = null;
+var countdownInterval = null;
+var glucoseCtx = { type: null, rec: null };
+
+function loadData() {
+  try {
+    var raw = localStorage.getItem(DB_KEY);
+    if (raw) {
+      records = JSON.parse(raw).map(function(r) {
+        r.mealTime = r.mealTime ? new Date(r.mealTime) : null;
+        r.remindAt = r.remindAt ? new Date(r.remindAt) : null;
+        if (r.glucose) r.glucose.time = new Date(r.glucose.time);
+        return r;
+      });
+    }
+  } catch(e) { records = []; }
+}
+
+function saveData() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(records)); } catch(e) {}
+}
+
+// ─── Utilities ──────────────────────────────────────────────────────
+function $(id) { return document.getElementById(id); }
+
+function fmtTime(d) {
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function fmtDate(d) {
+  var now = new Date();
+  if (d.toDateString() === now.toDateString()) return '今天';
+  var y = d.getFullYear(), m = d.getMonth()+1, day = d.getDate();
+  return m + '月' + day + '日';
+}
+
+function updSlider(id, val, unit) { $(id).textContent = val + unit; }
+
+function openSheet(id) {
+  $(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(id) {
+  $(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ─── Nav ────────────────────────────────────────────────────────────
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  $('page-' + name).classList.add('active');
+  $('nav-' + name).classList.add('active');
+  if (name === 'history') renderHistory();
+  if (name === 'stats') renderStats();
+}
+
+// ─── Header date ────────────────────────────────────────────────────
+function updateHeaderDate() {
+  var now = new Date();
+  var days = ['周日','周一','周二','周三','周四','周五','周六'];
+  $('headerDate').textContent = (now.getMonth()+1) + '月' + now.getDate() + '日 ' + days[now.getDay()];
+}
+
+// ─── Notification ───────────────────────────────────────────────────
+function requestNotify() {
+  if (!('Notification' in window)) { alert('此浏览器不支持系统通知，将使用应用内弹窗提醒'); return; }
+  Notification.requestPermission().then(function(p) {
+    if (p === 'granted') { $('notifyBanner').style.display = 'none'; }
+    else { $('notifyBanner').querySelector('span:last-of-type').textContent = '通知被拒绝，将使用应用内弹窗'; }
+  });
+}
+
+function checkNotifyBanner() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') $('notifyBanner').style.display = 'flex';
+}
+
+// ─── Meal recording ─────────────────────────────────────────────────
+var pendingMealTime = null;
+var pendingMealType = null;
+
+function guessedMeal(h) {
+  if (h >= 5 && h < 10) return '早餐';
+  if (h >= 11 && h < 14) return '午餐';
+  if (h >= 17 && h < 21) return '晚餐';
+  return null;
+}
+
+function tapEaten() {
+  pendingMealTime = new Date();
+  var h = pendingMealTime.getHours();
+  var guess = guessedMeal(h);
+  if (guess) {
+    pendingMealType = guess;
+    openSheet('foodSheet');
+  } else {
+    $('mealSheetTime').textContent = '现在是 ' + fmtTime(pendingMealTime) + '，不在常规用餐时段';
+    openSheet('mealSheet');
+  }
+}
+
+function confirmMealType(type) {
+  pendingMealType = type;
+  closeSheet('mealSheet');
+  openSheet('foodSheet');
+}
+
+function saveFoodAndSetAlarm() {
+  var food = {
+    carb: +$('carbSlider').value,
+    prot: +$('protSlider').value,
+    veg: +$('vegSlider').value,
+    feeling: $('feelingSelect').value,
+    note: $('foodNote').value.trim()
+  };
+  closeSheet('foodSheet');
+  createMealRecord(food);
+  resetFoodForm();
+}
+
+function skipFoodAndSetAlarm() {
+  closeSheet('foodSheet');
+  createMealRecord(null);
+  resetFoodForm();
+}
+
+function resetFoodForm() {
+  $('carbSlider').value = 100; updSlider('carbVal', 100, 'g');
+  $('protSlider').value = 60;  updSlider('protVal', 60, 'g');
+  $('vegSlider').value = 150;  updSlider('vegVal', 150, 'g');
+  $('feelingSelect').value = '';
+  $('foodNote').value = '';
+}
+
+function createMealRecord(food) {
+  var remindAt = new Date(pendingMealTime.getTime() + 2 * 3600 * 1000);
+  var rec = {
+    id: Date.now(),
+    type: 'meal',
+    mealType: pendingMealType,
+    mealTime: pendingMealTime,
+    remindAt: remindAt,
+    food: food,
+    glucose: null
+  };
+  records.unshift(rec);
+  saveData();
+  setCurrentAlarm(rec);
+  renderToday();
+}
+
+// ─── Alarm ──────────────────────────────────────────────────────────
+function setCurrentAlarm(rec) {
+  clearAlarmTimers();
+  currentAlarm = rec;
+  var ms = rec.remindAt - new Date();
+
+  if (ms > 0) {
+    alarmTimeout = setTimeout(function() { triggerRemind(rec); }, ms);
+    countdownInterval = setInterval(function() { updateCountdown(); }, 1000);
+  }
+
+  // Native notification
+  if ('Notification' in window && Notification.permission === 'granted' && ms > 0) {
+    setTimeout(function() {
+      try {
+        new Notification('⏰ 该测餐后血糖了', {
+          body: rec.mealType + ' 已过2小时，请现在测血糖',
+          icon: 'icon-192.png',
+          tag: 'glucose-remind'
+        });
+      } catch(e) {}
+    }, ms);
+  }
+
+  renderAlarmCard();
+}
+
+function renderAlarmCard() {
+  if (!currentAlarm) { $('alarmCard').style.display = 'none'; return; }
+  var rec = currentAlarm;
+  var ms = rec.remindAt - new Date();
+  if (ms <= 0) { $('alarmCard').style.display = 'none'; return; }
+  $('alarmCard').style.display = 'block';
+  $('alarmMealTag').textContent = rec.mealType;
+  $('remindAtText').textContent = '提醒时间：' + fmtTime(rec.remindAt);
+  updateCountdown();
+}
+
+function updateCountdown() {
+  if (!currentAlarm) return;
+  var diff = currentAlarm.remindAt - new Date();
+  if (diff <= 0) {
+    $('countdown').textContent = '时间到';
+    clearInterval(countdownInterval);
+    return;
+  }
+  var h = Math.floor(diff / 3600000);
+  var m = Math.floor((diff % 3600000) / 60000);
+  var s = Math.floor((diff % 60000) / 1000);
+  if (h > 0) {
+    $('countdown').textContent = h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  } else {
+    $('countdown').textContent = m + ':' + String(s).padStart(2,'0');
+  }
+}
+
+function clearAlarmTimers() {
+  if (alarmTimeout) { clearTimeout(alarmTimeout); alarmTimeout = null; }
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+  if (snoozeTimeout) { clearTimeout(snoozeTimeout); snoozeTimeout = null; }
+}
+
+function cancelAlarm() {
+  clearAlarmTimers();
+  currentAlarm = null;
+  $('alarmCard').style.display = 'none';
+}
+
+function triggerRemind(rec) {
+  clearInterval(countdownInterval);
+  $('alarmCard').style.display = 'none';
+  $('remindInfo').textContent = rec.mealType + ' 用餐于 ' + fmtTime(rec.mealTime) + '，现在正好2小时';
+  glucoseCtx = { type: 'post', rec: rec };
+  openSheet('remindSheet');
+}
+
+function snooze() {
+  closeSheet('remindSheet');
+  var rec = glucoseCtx.rec;
+  snoozeTimeout = setTimeout(function() { triggerRemind(rec); }, 10 * 60 * 1000);
+}
+
+// ─── Glucose entry ──────────────────────────────────────────────────
+function openGlucoseSheet(type, rec) {
+  glucoseCtx = { type: type, rec: rec || currentAlarm || null };
+  if (type === 'fasting') {
+    $('glucoseTitle').textContent = '空腹血糖';
+    $('glucoseSub').textContent = '建议早晨起床后、未进食前测量';
+    $('glucoseRef').textContent = '正常参考值：3.9 – 6.1 mmol/L';
+  } else {
+    $('glucoseTitle').textContent = '餐后2小时血糖';
+    $('glucoseSub').textContent = '从第一口饭开始算满2小时';
+    $('glucoseRef').textContent = '正常参考值：< 7.8 mmol/L';
+  }
+  $('glucoseInput').value = '';
+  $('glucoseFeedback').style.display = 'none';
+  openSheet('glucoseSheet');
+  setTimeout(function() { $('glucoseInput').focus(); }, 350);
+}
+
+function saveGlucose() {
+  var v = parseFloat($('glucoseInput').value);
+  if (!v || v < 1 || v > 30) {
+    $('glucoseFeedback').style.display = 'block';
+    $('glucoseFeedback').className = 'feedback yellow';
+    $('glucoseFeedback').textContent = '请输入有效血糖值（1–30 mmol/L）';
+    return;
+  }
+
+  var type = glucoseCtx.type;
+  var hint = '', level = '';
+  if (type === 'fasting') {
+    if (v < 3.9) { hint = '⚠️ 偏低（低血糖），注意补充糖分'; level = 'red'; }
+    else if (v <= 6.1) { hint = '✅ 正常范围'; level = 'green'; }
+    else if (v <= 7.0) { hint = '⚠️ 略偏高，注意饮食控制'; level = 'yellow'; }
+    else { hint = '🚨 明显偏高，建议就医'; level = 'red'; }
+  } else {
+    if (v < 7.8) { hint = '✅ 达标，控制良好'; level = 'green'; }
+    else if (v < 11.1) { hint = '⚠️ 偏高，注意本次饮食'; level = 'yellow'; }
+    else { hint = '🚨 明显偏高，建议就医或调整用药'; level = 'red'; }
+  }
+
+  $('glucoseFeedback').style.display = 'block';
+  $('glucoseFeedback').className = 'feedback ' + level;
+  $('glucoseFeedback').textContent = hint;
+
+  var gRec = { val: v, time: new Date(), level: level };
+
+  if (glucoseCtx.rec && type === 'post') {
+    glucoseCtx.rec.glucose = gRec;
+  } else if (glucoseCtx.rec && type === 'fasting') {
+    glucoseCtx.rec.fastingGlucose = gRec;
+  } else {
+    // standalone fasting entry
+    records.unshift({
+      id: Date.now(), type: 'fasting', mealType: '空腹',
+      mealTime: new Date(), remindAt: null, food: null,
+      glucose: gRec
+    });
+  }
+
+  saveData();
+  renderToday();
+
+  setTimeout(function() {
+    closeSheet('glucoseSheet');
+    $('glucoseFeedback').style.display = 'none';
+    if (type === 'post') cancelAlarm();
+  }, 1600);
+}
+
+// ─── Render today ────────────────────────────────────────────────────
+function renderToday() {
+  var now = new Date();
+  var today = records.filter(function(r) {
+    var t = r.mealTime || new Date();
+    return t.toDateString() === now.toDateString();
+  });
+
+  if (!today.length) {
+    $('todaySection').innerHTML = '';
+    return;
+  }
+
+  var html = '<div class="card"><div class="card-header"><span class="card-title">今日</span></div>';
+  today.forEach(function(r, i) {
+    var g = r.glucose;
+    var levelColor = { green: 'var(--success)', yellow: 'var(--warning)', red: 'var(--danger)' };
+    html += '<div class="record-row">';
+    html += '<div class="record-icon" style="background:' + (r.type==='fasting'?'var(--warning-light)':'var(--accent-light)') + '">' + (r.type==='fasting'?'💉':'🍚') + '</div>';
+    html += '<div class="record-info">';
+    html += '<div class="record-name">' + (r.mealType||'空腹') + '</div>';
+    html += '<div class="record-meta">' + fmtTime(r.mealTime||new Date());
+    if (r.remindAt) html += ' · 提醒 ' + fmtTime(r.remindAt);
+    if (r.food && r.food.carb) html += ' · 碳水 ' + r.food.carb + 'g';
+    html += '</div></div>';
+    if (g) {
+      html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + g.val.toFixed(1) + '</div><div class="glucose-unit">mmol/L</div></div>';
+    } else if (r.type !== 'fasting') {
+      var ri = records.indexOf(r);
+      html += '<button class="inline-btn" onclick="openGlucoseSheet(\'post\',records[' + ri + '])">记录血糖</button>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  $('todaySection').innerHTML = html;
+}
+
+// ─── Render history ──────────────────────────────────────────────────
+function renderHistory() {
+  if (!records.length) {
+    $('historySection').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>暂无历史记录</p></div>';
+    return;
+  }
+
+  var grouped = {};
+  records.forEach(function(r) {
+    var d = new Date(r.mealTime || Date.now());
+    var key = d.toDateString();
+    if (!grouped[key]) grouped[key] = { label: fmtDate(d), items: [] };
+    grouped[key].items.push(r);
+  });
+
+  var levelColor = { green: 'var(--success)', yellow: 'var(--warning)', red: 'var(--danger)' };
+  var html = '';
+  Object.keys(grouped).forEach(function(k) {
+    var day = grouped[k];
+    html += '<div class="day-label">' + day.label + '</div>';
+    html += '<div class="card">';
+    day.items.forEach(function(r) {
+      var g = r.glucose;
+      html += '<div class="record-row">';
+      html += '<div class="record-icon" style="background:' + (r.type==='fasting'?'var(--warning-light)':'var(--accent-light)') + '">' + (r.type==='fasting'?'💉':'🍚') + '</div>';
+      html += '<div class="record-info"><div class="record-name">' + (r.mealType||'空腹') + '</div>';
+      html += '<div class="record-meta">' + fmtTime(new Date(r.mealTime||Date.now()));
+      if (r.food && r.food.carb) html += ' · 碳水 ' + r.food.carb + 'g';
+      if (r.food && r.food.note) html += ' · ' + r.food.note;
+      html += '</div></div>';
+      if (g) {
+        html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + g.val.toFixed(1) + '</div><div class="glucose-unit">mmol/L</div></div>';
+      } else {
+        html += '<div class="record-value"><div class="glucose-unit" style="color:var(--text-hint)">待测</div></div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  $('historySection').innerHTML = html;
+}
+
+// ─── Render stats ────────────────────────────────────────────────────
+function renderStats() {
+  var withGlucose = records.filter(function(r) { return r.glucose; });
+  if (!withGlucose.length) {
+    $('statsSection').innerHTML = '<div class="empty"><div class="empty-icon">📊</div><p>记录血糖数据后这里会显示统计</p></div>';
+    return;
+  }
+
+  var vals = withGlucose.map(function(r) { return r.glucose.val; });
+  var avg = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(1);
+  var mx = Math.max.apply(null, vals).toFixed(1);
+  var mn = Math.min.apply(null, vals).toFixed(1);
+  var postRecs = withGlucose.filter(function(r) { return r.type !== 'fasting'; });
+  var normalPost = postRecs.filter(function(r) { return r.glucose.val < 7.8; }).length;
+  var pct = postRecs.length ? Math.round(normalPost / postRecs.length * 100) : '--';
+
+  var html = '<div class="card"><div class="card-header"><span class="card-title">总览</span><span class="badge badge-blue">' + withGlucose.length + ' 次记录</span></div>';
+  html += '<div class="stat-grid">';
+  html += '<div class="stat-box"><div class="stat-num">' + avg + '</div><div class="stat-label">平均血糖 mmol/L</div></div>';
+  html += '<div class="stat-box"><div class="stat-num" style="color:var(--success)">' + (pct === '--' ? '--' : pct + '%') + '</div><div class="stat-label">餐后达标率</div></div>';
+  html += '<div class="stat-box"><div class="stat-num" style="color:var(--danger)">' + mx + '</div><div class="stat-label">最高值</div></div>';
+  html += '<div class="stat-box"><div class="stat-num" style="color:var(--accent)">' + mn + '</div><div class="stat-label">最低值</div></div>';
+  html += '</div></div>';
+
+  // Chart (last 10 records with glucose)
+  var recent = withGlucose.slice(0, 10).reverse();
+  if (recent.length >= 2) {
+    var maxV = Math.max.apply(null, recent.map(function(r){return r.glucose.val;}));
+    var levelColor = { green: 'var(--success)', yellow: 'var(--warning)', red: 'var(--danger)' };
+    html += '<div class="card"><div class="card-title" style="margin-bottom:8px">近期趋势</div>';
+    html += '<div class="mini-bars">';
+    recent.forEach(function(r) {
+      var pct2 = Math.round((r.glucose.val / (maxV * 1.1)) * 100);
+      var col = levelColor[r.glucose.level] || 'var(--text-muted)';
+      html += '<div class="bar-col">';
+      html += '<div class="bar-num" style="color:' + col + '">' + r.glucose.val.toFixed(1) + '</div>';
+      html += '<div class="bar-seg" style="height:' + pct2 + '%;background:' + col + ';opacity:0.6"></div>';
+      html += '<div class="bar-txt">' + (r.mealType||'空腹').slice(0,2) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">餐后达标线：7.8 mmol/L</div>';
+    html += '</div>';
+  }
+
+  // Meal type breakdown
+  var mealTypes = {};
+  postRecs.forEach(function(r) {
+    var mt = r.mealType || '其他';
+    if (!mealTypes[mt]) mealTypes[mt] = { total: 0, vals: [] };
+    mealTypes[mt].total++;
+    mealTypes[mt].vals.push(r.glucose.val);
+  });
+  if (Object.keys(mealTypes).length) {
+    html += '<div class="card"><div class="card-title" style="margin-bottom:8px">按餐型平均</div>';
+    Object.keys(mealTypes).forEach(function(mt) {
+      var info = mealTypes[mt];
+      var avg2 = (info.vals.reduce(function(a,b){return a+b;},0)/info.vals.length).toFixed(1);
+      var col = avg2 < 7.8 ? 'var(--success)' : avg2 < 11.1 ? 'var(--warning)' : 'var(--danger)';
+      html += '<div class="record-row">';
+      html += '<div class="record-info"><div class="record-name">' + mt + '</div><div class="record-meta">' + info.total + ' 次记录</div></div>';
+      html += '<div style="font-size:18px;font-weight:600;color:' + col + '">' + avg2 + ' <span style="font-size:11px;font-weight:400;color:var(--text-muted)">mmol/L</span></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  $('statsSection').innerHTML = html;
+}
+
+// ─── Restore active alarm on page load ──────────────────────────────
+function restoreAlarm() {
+  var now = new Date();
+  // Find any meal record from today with no glucose that remindAt is in future
+  var pending = records.find(function(r) {
+    return r.type === 'meal' && !r.glucose && r.remindAt && new Date(r.remindAt) > now;
+  });
+  if (pending) setCurrentAlarm(pending);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────
+loadData();
+updateHeaderDate();
+checkNotifyBanner();
+renderToday();
+restoreAlarm();
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+
+// Close sheets on overlay click
+document.querySelectorAll('.overlay').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    if (e.target === el) closeSheet(el.id);
+  });
+});
+</script>
+</body>
+</html>
