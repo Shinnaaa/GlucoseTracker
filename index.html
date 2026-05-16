@@ -663,7 +663,7 @@ input:focus, select:focus, textarea:focus {
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="glucoseTitle">记录血糖</div>
     <div class="sheet-sub" id="glucoseSub"></div>
-    <input class="glucose-big" type="number" id="glucoseInput" placeholder="输入血糖值" step="0.1" min="1" max="30" inputmode="decimal">
+    <input class="glucose-big" type="number" id="glucoseInput" placeholder="mg/dL" step="1" min="20" max="600" inputmode="decimal">
     <div class="range-ref" id="glucoseRef"></div>
     <div id="glucoseFeedback" style="display:none" class="feedback"></div>
     <button class="btn-primary" style="margin-top:16px" onclick="saveGlucose()">保存</button>
@@ -929,11 +929,11 @@ function openGlucoseSheet(type, rec) {
   if (type === 'fasting') {
     $('glucoseTitle').textContent = '空腹血糖';
     $('glucoseSub').textContent = '建议早晨起床后、未进食前测量';
-    $('glucoseRef').textContent = '正常参考值：3.9 – 6.1 mmol/L';
+    $('glucoseRef').textContent = '正常参考値：70 – 110 mg/dL';
   } else {
     $('glucoseTitle').textContent = '餐后2小时血糖';
     $('glucoseSub').textContent = '从第一口饭开始算满2小时';
-    $('glucoseRef').textContent = '正常参考值：< 7.8 mmol/L';
+    $('glucoseRef').textContent = '正常参考値：< 140 mg/dL';
   }
   $('glucoseInput').value = '';
   $('glucoseFeedback').style.display = 'none';
@@ -943,23 +943,23 @@ function openGlucoseSheet(type, rec) {
 
 function saveGlucose() {
   var v = parseFloat($('glucoseInput').value);
-  if (!v || v < 1 || v > 30) {
+  if (!v || v < 20 || v > 600) {
     $('glucoseFeedback').style.display = 'block';
     $('glucoseFeedback').className = 'feedback yellow';
-    $('glucoseFeedback').textContent = '请输入有效血糖值（1–30 mmol/L）';
+    $('glucoseFeedback').textContent = '請入力してください（20–600 mg/dL）';
     return;
   }
 
   var type = glucoseCtx.type;
   var hint = '', level = '';
   if (type === 'fasting') {
-    if (v < 3.9) { hint = '⚠️ 偏低（低血糖），注意补充糖分'; level = 'red'; }
-    else if (v <= 6.1) { hint = '✅ 正常范围'; level = 'green'; }
-    else if (v <= 7.0) { hint = '⚠️ 略偏高，注意饮食控制'; level = 'yellow'; }
+    if (v < 70)  { hint = '⚠️ 偏低（低血糖），注意补充糖分'; level = 'red'; }
+    else if (v <= 110) { hint = '✅ 正常范围'; level = 'green'; }
+    else if (v <= 126) { hint = '⚠️ 略偏高，注意饮食控制'; level = 'yellow'; }
     else { hint = '🚨 明显偏高，建议就医'; level = 'red'; }
   } else {
-    if (v < 7.8) { hint = '✅ 达标，控制良好'; level = 'green'; }
-    else if (v < 11.1) { hint = '⚠️ 偏高，注意本次饮食'; level = 'yellow'; }
+    if (v < 140)  { hint = '✅ 达标，控制良好'; level = 'green'; }
+    else if (v < 200) { hint = '⚠️ 偏高，注意本次饮食'; level = 'yellow'; }
     else { hint = '🚨 明显偏高，建议就医或调整用药'; level = 'red'; }
   }
 
@@ -1018,7 +1018,7 @@ function renderToday() {
     if (r.food && r.food.carb) html += ' · 碳水 ' + r.food.carb + 'g';
     html += '</div></div>';
     if (g) {
-      html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + g.val.toFixed(1) + '</div><div class="glucose-unit">mmol/L</div></div>';
+      html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + Math.round(g.val) + '</div><div class="glucose-unit">mg/dL</div></div>';
     } else if (r.type !== 'fasting') {
       var ri = records.indexOf(r);
       html += '<button class="inline-btn" onclick="openGlucoseSheet(\'post\',records[' + ri + '])">记录血糖</button>';
@@ -1060,7 +1060,7 @@ function renderHistory() {
       if (r.food && r.food.note) html += ' · ' + r.food.note;
       html += '</div></div>';
       if (g) {
-        html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + g.val.toFixed(1) + '</div><div class="glucose-unit">mmol/L</div></div>';
+        html += '<div class="record-value"><div class="glucose-value" style="color:' + (levelColor[g.level]||'var(--text)') + '">' + Math.round(g.val) + '</div><div class="glucose-unit">mg/dL</div></div>';
       } else {
         html += '<div class="record-value"><div class="glucose-unit" style="color:var(--text-hint)">待测</div></div>';
       }
@@ -1080,16 +1080,16 @@ function renderStats() {
   }
 
   var vals = withGlucose.map(function(r) { return r.glucose.val; });
-  var avg = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(1);
-  var mx = Math.max.apply(null, vals).toFixed(1);
-  var mn = Math.min.apply(null, vals).toFixed(1);
+  var avg = Math.round(vals.reduce(function(a,b){return a+b;},0) / vals.length);
+  var mx = Math.round(Math.max.apply(null, vals));
+  var mn = Math.round(Math.min.apply(null, vals));
   var postRecs = withGlucose.filter(function(r) { return r.type !== 'fasting'; });
-  var normalPost = postRecs.filter(function(r) { return r.glucose.val < 7.8; }).length;
+  var normalPost = postRecs.filter(function(r) { return r.glucose.val < 140; }).length;
   var pct = postRecs.length ? Math.round(normalPost / postRecs.length * 100) : '--';
 
   var html = '<div class="card"><div class="card-header"><span class="card-title">总览</span><span class="badge badge-blue">' + withGlucose.length + ' 次记录</span></div>';
   html += '<div class="stat-grid">';
-  html += '<div class="stat-box"><div class="stat-num">' + avg + '</div><div class="stat-label">平均血糖 mmol/L</div></div>';
+  html += '<div class="stat-box"><div class="stat-num">' + avg + '</div><div class="stat-label">平均血糖 mg/dL</div></div>';
   html += '<div class="stat-box"><div class="stat-num" style="color:var(--success)">' + (pct === '--' ? '--' : pct + '%') + '</div><div class="stat-label">餐后达标率</div></div>';
   html += '<div class="stat-box"><div class="stat-num" style="color:var(--danger)">' + mx + '</div><div class="stat-label">最高值</div></div>';
   html += '<div class="stat-box"><div class="stat-num" style="color:var(--accent)">' + mn + '</div><div class="stat-label">最低值</div></div>';
@@ -1106,13 +1106,13 @@ function renderStats() {
       var pct2 = Math.round((r.glucose.val / (maxV * 1.1)) * 100);
       var col = levelColor[r.glucose.level] || 'var(--text-muted)';
       html += '<div class="bar-col">';
-      html += '<div class="bar-num" style="color:' + col + '">' + r.glucose.val.toFixed(1) + '</div>';
+      html += '<div class="bar-num" style="color:' + col + '">' + Math.round(r.glucose.val) + '</div>';
       html += '<div class="bar-seg" style="height:' + pct2 + '%;background:' + col + ';opacity:0.6"></div>';
       html += '<div class="bar-txt">' + (r.mealType||'空腹').slice(0,2) + '</div>';
       html += '</div>';
     });
     html += '</div>';
-    html += '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">餐后达标线：7.8 mmol/L</div>';
+    html += '<div style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:4px">餐后达标线：140 mg/dL</div>';
     html += '</div>';
   }
 
@@ -1128,11 +1128,11 @@ function renderStats() {
     html += '<div class="card"><div class="card-title" style="margin-bottom:8px">按餐型平均</div>';
     Object.keys(mealTypes).forEach(function(mt) {
       var info = mealTypes[mt];
-      var avg2 = (info.vals.reduce(function(a,b){return a+b;},0)/info.vals.length).toFixed(1);
-      var col = avg2 < 7.8 ? 'var(--success)' : avg2 < 11.1 ? 'var(--warning)' : 'var(--danger)';
+      var avg2 = Math.round(info.vals.reduce(function(a,b){return a+b;},0)/info.vals.length);
+      var col = avg2 < 140 ? 'var(--success)' : avg2 < 200 ? 'var(--warning)' : 'var(--danger)';
       html += '<div class="record-row">';
       html += '<div class="record-info"><div class="record-name">' + mt + '</div><div class="record-meta">' + info.total + ' 次记录</div></div>';
-      html += '<div style="font-size:18px;font-weight:600;color:' + col + '">' + avg2 + ' <span style="font-size:11px;font-weight:400;color:var(--text-muted)">mmol/L</span></div>';
+      html += '<div style="font-size:18px;font-weight:600;color:' + col + '">' + avg2 + ' <span style="font-size:11px;font-weight:400;color:var(--text-muted)">mg/dL</span></div>';
       html += '</div>';
     });
     html += '</div>';

@@ -2,7 +2,7 @@
   "name": "血糖记录",
   "short_name": "血糖记录",
   "description": "糖尿病餐后血糖追踪工具，2小时提醒测血糖",
-  "start_url": "/",
+  "start_url": "https://shinnaaa.github.io/GlucoseTracker/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f7cff",
@@ -28,7 +28,7 @@
       "name": "吃完了",
       "short_name": "记录用餐",
       "description": "快速记录用餐时间",
-      "url": "/?action=meal",
+      "url": "https://shinnaaa.github.io/GlucoseTracker/?action=meal",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
