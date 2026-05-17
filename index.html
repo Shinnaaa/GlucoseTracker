@@ -181,13 +181,17 @@ select:focus,input:focus{outline:none;border-color:var(--green)}
   <div class="hdr">
     <div class="hdr-row">
       <div class="hdr-title">血糖記録</div>
-      <div class="hdr-date" id="hdrDate"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="syncDot" title="同期状態" style="display:none;width:8px;height:8px;border-radius:50%;transition:background .3s"></div>
+        <div class="hdr-date" id="hdrDate"></div>
+      </div>
     </div>
   </div>
   <div class="tabs">
-    <div class="tab active"  id="tab-home"    onclick="switchPage('home')">記録</div>
-    <div class="tab"         id="tab-history" onclick="switchPage('history')">履歴</div>
-    <div class="tab"         id="tab-stats"   onclick="switchPage('stats')">統計</div>
+    <div class="tab active"  id="tab-home"     onclick="switchPage('home')">記録</div>
+    <div class="tab"         id="tab-history"  onclick="switchPage('history')">履歴</div>
+    <div class="tab"         id="tab-stats"    onclick="switchPage('stats')">統計</div>
+    <div class="tab"         id="tab-settings" onclick="switchPage('settings')">設定</div>
   </div>
   <div id="scr">
     <!-- HOME -->
@@ -213,11 +217,14 @@ select:focus,input:focus{outline:none;border-color:var(--green)}
     <div class="page" id="page-history"><div id="histS"></div></div>
     <!-- STATS -->
     <div class="page" id="page-stats"><div id="statS"></div></div>
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings"><div id="settingsS"></div></div>
   </div>
   <div class="bnav">
-    <div class="nav-i active" id="nav-home"    onclick="switchPage('home')">   <div class="nav-ico">🏠</div><div class="nav-lbl">記録</div></div>
-    <div class="nav-i"        id="nav-history" onclick="switchPage('history')"><div class="nav-ico">📋</div><div class="nav-lbl">履歴</div></div>
-    <div class="nav-i"        id="nav-stats"   onclick="switchPage('stats')">  <div class="nav-ico">📊</div><div class="nav-lbl">統計</div></div>
+    <div class="nav-i active" id="nav-home"     onclick="switchPage('home')">   <div class="nav-ico">🏠</div><div class="nav-lbl">記録</div></div>
+    <div class="nav-i"        id="nav-history"  onclick="switchPage('history')"><div class="nav-ico">📋</div><div class="nav-lbl">履歴</div></div>
+    <div class="nav-i"        id="nav-stats"    onclick="switchPage('stats')">  <div class="nav-ico">📊</div><div class="nav-lbl">統計</div></div>
+    <div class="nav-i"        id="nav-settings" onclick="switchPage('settings')"><div class="nav-ico">⚙️</div><div class="nav-lbl">設定</div></div>
   </div>
 </div>
 
@@ -369,13 +376,14 @@ function closeSheet(id) { $(id).classList.remove('open'); document.body.style.ov
 
 // ── Nav ──────────────────────────────────────────────────────────
 function switchPage(n) {
-  ['home','history','stats'].forEach(function(x) {
+  ['home','history','stats','settings'].forEach(function(x) {
     $('page-'+x).classList.toggle('active', x===n);
     $('tab-'+x).classList.toggle('active', x===n);
     $('nav-'+x).classList.toggle('active', x===n);
   });
   if (n === 'history') renderHist();
   if (n === 'stats')   renderStat();
+  if (n === 'settings') renderSettings();
 }
 
 function initHeader() {
@@ -780,17 +788,237 @@ function renderStat() {
   $('statS').innerHTML = html;
 }
 
+// ── Gist Sync ────────────────────────────────────────────────────
+var SYNC_KEY  = 'glu_sync_v1';   // stores { token, gistId, lastPush }
+var GIST_FILE = 'glucose-records.json';
+var syncCfg   = { token:'', gistId:'' };
+var syncTimer = null;
+
+function loadSyncCfg() {
+  try { var r = localStorage.getItem(SYNC_KEY); if (r) syncCfg = JSON.parse(r); } catch(e) {}
+}
+function saveSyncCfg() { try { localStorage.setItem(SYNC_KEY, JSON.stringify(syncCfg)); } catch(e) {} }
+
+function setSyncDot(state) {
+  // state: 'ok' | 'busy' | 'err' | 'off'
+  var dot = $('syncDot');
+  if (!dot) return;
+  if (state === 'off') { dot.style.display = 'none'; return; }
+  dot.style.display = 'block';
+  dot.style.background = state === 'ok' ? 'var(--green)' : state === 'busy' ? 'var(--amber)' : 'var(--red)';
+  dot.title = state === 'ok' ? '同期済み' : state === 'busy' ? '同期中...' : '同期エラー';
+}
+
+async function gistReq(method, path, body) {
+  var opts = {
+    method: method,
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': 'Bearer ' + syncCfg.token,
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  var res = await fetch('https://api.github.com' + path, opts);
+  if (!res.ok) { var t = await res.text(); throw new Error(res.status + ': ' + t); }
+  return res.json();
+}
+
+// Push local data to Gist (create if no gistId yet)
+async function pushToGist() {
+  if (!syncCfg.token) return;
+  setSyncDot('busy');
+  try {
+    var payload = { records: recs, pushedAt: Date.now() };
+    var files = {}; files[GIST_FILE] = { content: JSON.stringify(payload, null, 2) };
+    var data;
+    if (syncCfg.gistId) {
+      data = await gistReq('PATCH', '/gists/' + syncCfg.gistId, { files: files });
+    } else {
+      data = await gistReq('POST', '/gists', { description: '血糖記録バックアップ', public: false, files: files });
+      syncCfg.gistId = data.id;
+    }
+    syncCfg.lastPush = Date.now();
+    saveSyncCfg();
+    setSyncDot('ok');
+    renderSettings();
+  } catch(e) {
+    console.error('Gist push failed:', e);
+    setSyncDot('err');
+  }
+}
+
+// Pull from Gist and merge (newer record wins by id)
+async function pullFromGist() {
+  if (!syncCfg.token || !syncCfg.gistId) return false;
+  setSyncDot('busy');
+  try {
+    var data = await gistReq('GET', '/gists/' + syncCfg.gistId);
+    var raw  = data.files[GIST_FILE];
+    if (!raw || !raw.content) { setSyncDot('ok'); return false; }
+    var remote = JSON.parse(raw.content);
+    if (!remote.records) { setSyncDot('ok'); return false; }
+    // Merge: build map by id, remote wins on conflict
+    var map = {};
+    recs.forEach(function(r) { map[r.id] = r; });
+    remote.records.forEach(function(r) { map[r.id] = r; });  // remote overwrites
+    recs = Object.values(map).sort(function(a,b){ return b.mealTime - a.mealTime; });
+    recs.forEach(function(r) { r.mealTime = +r.mealTime; if (r.glucose && r.glucose.time) r.glucose.time = +r.glucose.time; });
+    save();
+    setSyncDot('ok');
+    return true;
+  } catch(e) {
+    console.error('Gist pull failed:', e);
+    setSyncDot('err');
+    return false;
+  }
+}
+
+// Auto-push with debounce (1.5s after last save)
+function scheduleAutoSync() {
+  if (!syncCfg.token) return;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushToGist, 1500);
+}
+
+// Override save to trigger auto-sync
+var _origSave = save;
+save = function() { _origSave(); scheduleAutoSync(); };
+
+// ── Settings page ────────────────────────────────────────────────
+function renderSettings() {
+  var hasToken = !!syncCfg.token;
+  var hasGist  = !!syncCfg.gistId;
+  var lastPush = syncCfg.lastPush ? new Date(syncCfg.lastPush).toLocaleString('ja-JP') : '—';
+
+  var html = '<div class="card"><div class="card-lbl">Gist クラウド同期</div>';
+
+  if (!hasToken) {
+    html += '<p style="font-size:13px;color:var(--ink3);margin-bottom:14px">GitHub Personal Access Token を入力すると、データが自動的に Gist にバックアップされます。換えのデバイスでも復元できます。</p>';
+    html += '<div class="s-label">GitHub Token</div>';
+    html += '<input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxx" style="margin-bottom:8px">';
+    html += '<p style="font-size:12px;color:var(--ink4);margin-bottom:14px">Settings → Developer settings → Personal access tokens → <b>gist</b> スコープのみで OK</p>';
+    html += '<div class="s-label">既存の Gist ID（任意 — 他デバイスからの復元）</div>';
+    html += '<input type="text" id="cfgGistId" placeholder="（空欄なら自動作成）" style="margin-bottom:14px">';
+    html += '<button class="btn-p" onclick="connectGist()">接続する</button>';
+  } else {
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+    html += '<div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0"></div>';
+    html += '<div><div style="font-size:14px;font-weight:500">接続済み</div><div style="font-size:12px;color:var(--ink3)">最終同期: '+lastPush+'</div></div></div>';
+    html += '<div style="font-size:12px;color:var(--ink4);margin-bottom:4px">Gist ID</div>';
+    html += '<div style="font-size:13px;font-family:monospace;background:var(--paper3);padding:8px 12px;border-radius:var(--r-sm);margin-bottom:14px;word-break:break-all">'+(hasGist?syncCfg.gistId:'—')+'</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+    html += '<button class="btn-p" style="font-size:14px;padding:12px" onclick="manualPush()">⬆ 今すぐ保存</button>';
+    html += '<button class="btn-p" style="font-size:14px;padding:12px;background:var(--blue)" onclick="manualPull()">⬇ 復元する</button>';
+    html += '</div>';
+    html += '<button class="btn-d" onclick="disconnectGist()">接続を解除</button>';
+  }
+  html += '</div>';
+
+  // Export / Import
+  html += '<div class="card"><div class="card-lbl">ローカルバックアップ</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html += '<button class="sec-btn" style="margin:0;font-size:14px" onclick="exportJSON()">📤 JSON 書き出し</button>';
+  html += '<button class="sec-btn" style="margin:0;font-size:14px" onclick="$$(\'importFile\').click()">📥 JSON 読み込み</button>';
+  html += '</div>';
+  html += '<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(this)">';
+  html += '<p style="font-size:12px;color:var(--ink4);margin-top:10px">データを Files アプリや Google ドライブに保存しておくとより安全です。</p></div>';
+
+  // Stats summary
+  html += '<div class="card"><div class="card-lbl">データ概要</div>';
+  html += '<div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0">';
+  html += '<div><div style="font-family:var(--disp);font-size:28px;font-weight:300">'+recs.length+'</div><div style="font-size:11px;color:var(--ink4)">記録件数</div></div>';
+  html += '<div><div style="font-family:var(--disp);font-size:28px;font-weight:300">'+recs.filter(function(r){return r.glucose}).length+'</div><div style="font-size:11px;color:var(--ink4)">血糖値あり</div></div>';
+  if (recs.length) {
+    var oldest = new Date(recs[recs.length-1].mealTime);
+    html += '<div><div style="font-family:var(--disp);font-size:20px;font-weight:300;margin-top:4px">'+(oldest.getMonth()+1)+'/'+oldest.getDate()+'</div><div style="font-size:11px;color:var(--ink4)">最初の記録</div></div>';
+  }
+  html += '</div></div>';
+
+  $('settingsS').innerHTML = html;
+}
+
+function connectGist() {
+  var token = ($('cfgToken')||{}).value || '';
+  var gistId = ($('cfgGistId')||{}).value || '';
+  if (!token) { alert('Token を入力してください'); return; }
+  syncCfg.token = token.trim();
+  if (gistId.trim()) syncCfg.gistId = gistId.trim();
+  saveSyncCfg();
+  setSyncDot('busy');
+  pushToGist().then(function() { renderSettings(); });
+}
+
+function disconnectGist() {
+  if (!confirm('接続を解除しますか？ローカルデータは削除されません。')) return;
+  syncCfg = { token:'', gistId:'', lastPush:0 };
+  saveSyncCfg();
+  setSyncDot('off');
+  renderSettings();
+}
+
+async function manualPush() {
+  await pushToGist();
+  renderSettings();
+}
+
+async function manualPull() {
+  var pulled = await pullFromGist();
+  if (pulled) {
+    renderToday(); renderHist(); renderStat(); renderSettings();
+    alert('復元しました（'+recs.length+' 件）');
+  } else {
+    alert('データが見つかりませんでした');
+  }
+}
+
+function exportJSON() {
+  var payload = JSON.stringify({ records: recs, exportedAt: new Date().toISOString() }, null, 2);
+  var blob = new Blob([payload], { type: 'application/json' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'glucose-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      var imported = data.records || data;
+      if (!Array.isArray(imported)) { alert('形式が正しくありません'); return; }
+      // Merge
+      var map = {};
+      recs.forEach(function(r) { map[r.id] = r; });
+      imported.forEach(function(r) { map[r.id] = r; });
+      recs = Object.values(map).sort(function(a,b){ return b.mealTime - a.mealTime; });
+      recs.forEach(function(r) { r.mealTime = +r.mealTime; if (r.glucose && r.glucose.time) r.glucose.time = +r.glucose.time; });
+      save();
+      renderToday(); renderSettings();
+      alert('インポートしました（'+recs.length+' 件）');
+    } catch(ex) { alert('読み込みに失敗しました: ' + ex.message); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// $$ helper to avoid id collision with $
+function $$(id) { return document.getElementById(id); }
+
 // ── Restore alarms after page load ────────────────────────────────
 function restoreAlarms() {
   var saved = loadAlms();
   if (!saved || !saved.length) return;
   saved.forEach(function(a) {
     var rec = byId(a.recId);
-    if (!rec || rec.cancelled || rec.glucose) return; // skip if resolved
+    if (!rec || rec.cancelled || rec.glucose) return;
     a.remindAt = +a.remindAt;
     alarms.push(a);
     if (a.remindAt <= Date.now()) {
-      // Overdue — fire immediately
       setTimeout(function() { fireRemind(a.recId); }, 100);
     } else {
       startTimer(a, rec);
@@ -802,10 +1030,21 @@ function restoreAlarms() {
 
 // ── Boot ─────────────────────────────────────────────────────────
 load();
+loadSyncCfg();
 initHeader();
 checkBanner();
 renderToday();
 restoreAlarms();
+// On startup: if token configured, pull then compare with local
+if (syncCfg.token && syncCfg.gistId) {
+  setSyncDot('busy');
+  pullFromGist().then(function(pulled) {
+    if (pulled) { renderToday(); }
+    setSyncDot('ok');
+  });
+} else if (syncCfg.token) {
+  setSyncDot('ok');
+}
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
 document.querySelectorAll('.overlay').forEach(function(el) {
   el.addEventListener('click', function(e) { if (e.target === el) closeSheet(el.id); });
