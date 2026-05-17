@@ -14,50 +14,34 @@
 <title>血糖記録</title>
 <style>
 :root {
-  --ink:  #1a1f18;
-  --ink2: #3d4439;
-  --ink3: #6b7266;
-  --ink4: #a0a89a;
-  --paper:  #f5f2ec;
-  --paper2: #ede9e1;
-  --paper3: #e2ddd3;
-  --green:       #2d5a3d;
-  --green-light: #ddeee4;
-  --green-mid:   #4a8c5c;
-  --amber:       #b45309;
-  --amber-light: #fef3c7;
-  --red:         #b91c1c;
-  --red-light:   #fee2e2;
-  --blue:        #1d4ed8;
-  --blue-light:  #dbeafe;
-  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 26px;
-  --font-body: 'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;
-  --font-disp: 'Fraunces', Georgia, serif;
-  --sat: env(safe-area-inset-top,    0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sal: env(safe-area-inset-left,   0px);
-  --sar: env(safe-area-inset-right,  0px);
+  --ink:  #1a1f18; --ink2: #3d4439; --ink3: #6b7266; --ink4: #a0a89a;
+  --paper: #f5f2ec; --paper2: #ede9e1; --paper3: #e2ddd3;
+  --green: #2d5a3d; --green-l: #ddeee4; --green-m: #4a8c5c;
+  --amber: #b45309; --amber-l: #fef3c7;
+  --red:   #b91c1c; --red-l:   #fee2e2;
+  --blue:  #1d4ed8; --blue-l:  #dbeafe;
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+  --body: 'PingFang SC','Hiragino Sans GB',system-ui,sans-serif;
+  --disp: 'Fraunces',Georgia,serif;
+  --sat: env(safe-area-inset-top,0px); --sab: env(safe-area-inset-bottom,0px);
+  --sal: env(safe-area-inset-left,0px); --sar: env(safe-area-inset-right,0px);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink:  #eae6de; --ink2: #c8c4bb; --ink3: #8a8880; --ink4: #55534e;
-    --paper: #1a1c18; --paper2: #22251f; --paper3: #2a2e26;
-    --green: #4a9c63; --green-light: #0f2d1c; --green-mid: #3d8050;
-    --amber: #d97706; --amber-light: #1c1000;
-    --red: #ef4444;   --red-light: #1c0606;
-    --blue: #60a5fa;  --blue-light: #0f1f3d;
-  }
-}
+@media(prefers-color-scheme:dark){:root{
+  --ink:#eae6de;--ink2:#c8c4bb;--ink3:#8a8880;--ink4:#55534e;
+  --paper:#1a1c18;--paper2:#22251f;--paper3:#2a2e26;
+  --green:#4a9c63;--green-l:#0f2d1c;--green-m:#3d8050;
+  --amber:#d97706;--amber-l:#1c1000;--red:#ef4444;--red-l:#1c0606;
+  --blue:#60a5fa;--blue-l:#0f1f3d;
+}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%}
-body{font-family:var(--font-body);background:var(--paper);color:var(--ink);height:100%;overflow:hidden;font-size:15px;line-height:1.5}
-
+body{font-family:var(--body);background:var(--paper);color:var(--ink);height:100%;overflow:hidden;font-size:15px;line-height:1.5}
 #app{display:flex;flex-direction:column;height:100%}
 
 /* Header */
 .hdr{background:var(--paper);padding:calc(var(--sat) + 18px) calc(20px + var(--sar)) 14px calc(20px + var(--sal));border-bottom:1px solid var(--paper3);flex-shrink:0}
 .hdr-row{display:flex;align-items:flex-end;justify-content:space-between}
-.hdr-title{font-family:var(--font-disp);font-size:26px;font-weight:300;letter-spacing:-0.5px}
+.hdr-title{font-family:var(--disp);font-size:26px;font-weight:300;letter-spacing:-.5px}
 .hdr-date{font-size:13px;color:var(--ink3)}
 
 /* Tabs */
@@ -65,8 +49,8 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--ink);heigh
 .tab{flex:1;padding:11px 0;text-align:center;font-size:13px;font-weight:500;color:var(--ink4);border-bottom:2px solid transparent;cursor:pointer;transition:color .18s,border-color .18s;user-select:none}
 .tab.active{color:var(--green);border-bottom-color:var(--green)}
 
-/* Scroll area */
-#scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px calc(16px + var(--sar)) 24px calc(16px + var(--sal));-webkit-overflow-scrolling:touch;background:var(--paper)}
+/* Scroll */
+#scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px calc(16px + var(--sar)) 24px calc(16px + var(--sal));-webkit-overflow-scrolling:touch}
 #scr::-webkit-scrollbar{display:none}
 
 /* Pages */
@@ -78,23 +62,29 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--ink);heigh
 .card{background:var(--paper2);border-radius:var(--r-lg);border:1px solid var(--paper3);padding:16px;margin-bottom:12px}
 .card-lbl{font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 
-/* Alarm card */
-.alarm-card{background:var(--green-light);border:1px solid rgba(45,90,61,.18);border-radius:var(--r-lg);padding:18px;margin-bottom:12px;animation:pop .4s cubic-bezier(.34,1.56,.64,1)}
+/* Alarm cards container */
+#alarmCards{margin-bottom:4px}
+
+/* Single alarm card */
+.alarm-card{background:var(--green-l);border:1px solid rgba(45,90,61,.18);border-radius:var(--r-lg);padding:16px;margin-bottom:10px;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .alarm-meal{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
-.alarm-cd{font-family:var(--font-disp);font-size:54px;font-weight:300;color:var(--green);letter-spacing:-2px;line-height:1;margin:2px 0 4px}
-.alarm-sub{font-size:13px;color:var(--green-mid);margin-bottom:14px}
+.alarm-cd{font-family:var(--disp);font-size:46px;font-weight:300;color:var(--green);letter-spacing:-2px;line-height:1;margin:2px 0 4px}
+.alarm-sub{font-size:13px;color:var(--green-m);margin-bottom:12px}
+.alarm-actions{display:flex;gap:8px}
+.alarm-actions .btn-p{flex:1;padding:12px;font-size:14px}
+.alarm-actions .btn-g-sm{flex:0 0 auto;padding:12px 14px;background:transparent;border:1px solid rgba(45,90,61,.25);border-radius:var(--r-md);font-size:13px;color:var(--green-m);cursor:pointer;font-family:var(--body)}
 
 /* Hero btn */
 .hero-btn{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--r-xl);padding:0;cursor:pointer;display:flex;align-items:stretch;overflow:hidden;margin-bottom:10px;transition:transform .15s,opacity .15s;box-shadow:0 4px 20px rgba(45,90,61,.28)}
 .hero-btn:active{transform:scale(.97);opacity:.92}
 .hero-l{background:rgba(0,0,0,.13);padding:22px 18px;font-size:34px;display:flex;align-items:center}
 .hero-r{padding:20px 16px;text-align:left}
-.hero-lbl{font-family:var(--font-disp);font-size:22px;font-weight:300;letter-spacing:-.3px}
+.hero-lbl{font-family:var(--disp);font-size:22px;font-weight:300;letter-spacing:-.3px}
 .hero-sub{font-size:12px;opacity:.72;margin-top:3px;line-height:1.45}
 
 /* Sec btn */
-.sec-btn{width:100%;background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r-md);padding:14px 18px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,background .12s;margin-bottom:10px;font-family:var(--font-body)}
+.sec-btn{width:100%;background:var(--paper2);border:1px solid var(--paper3);border-radius:var(--r-md);padding:14px 18px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,background .12s;margin-bottom:10px;font-family:var(--body)}
 .sec-btn:active{transform:scale(.97);background:var(--paper3)}
 
 /* Record row */
@@ -104,36 +94,32 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--ink);heigh
 .rec-info{flex:1;min-width:0}
 .rec-name{font-size:15px;font-weight:500}
 .rec-meta{font-size:12px;color:var(--ink3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rec-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.rec-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .rec-val{text-align:right}
-.rec-num{font-family:var(--font-disp);font-size:20px;font-weight:300;line-height:1}
+.rec-num{font-family:var(--disp);font-size:20px;font-weight:300;line-height:1}
 .rec-unit{font-size:10px;color:var(--ink4)}
 
-/* Pill button */
-.pill{font-size:12px;padding:5px 11px;border:1px solid var(--paper3);border-radius:20px;background:var(--paper);color:var(--ink3);cursor:pointer;white-space:nowrap;font-family:var(--font-body);transition:background .12s}
+/* Pill */
+.pill{font-size:12px;padding:5px 11px;border:1px solid var(--paper3);border-radius:20px;background:var(--paper);color:var(--ink3);cursor:pointer;white-space:nowrap;font-family:var(--body);transition:background .12s}
 .pill:active{background:var(--paper3)}
-.pill.danger{color:var(--red);border-color:rgba(185,28,28,.22)}
-.pill.danger:active{background:var(--red-light)}
+.pill.red{color:var(--red);border-color:rgba(185,28,28,.22)}
+.pill.red:active{background:var(--red-l)}
 
 /* Notify banner */
-.n-banner{background:var(--amber-light);border:1px solid rgba(180,83,9,.18);border-radius:var(--r-md);padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--amber)}
-.n-banner button{margin-left:auto;padding:5px 12px;font-size:12px;font-weight:600;border:1px solid currentColor;border-radius:20px;background:transparent;color:inherit;cursor:pointer;font-family:var(--font-body)}
+.n-banner{background:var(--amber-l);border:1px solid rgba(180,83,9,.18);border-radius:var(--r-md);padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--amber)}
+.n-banner button{margin-left:auto;padding:5px 12px;font-size:12px;font-weight:600;border:1px solid currentColor;border-radius:20px;background:transparent;color:inherit;cursor:pointer;font-family:var(--body)}
 
 /* Stats */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .stat-box{background:var(--paper);border:1px solid var(--paper3);border-radius:var(--r-md);padding:14px 12px}
-.stat-num{font-family:var(--font-disp);font-size:28px;font-weight:300;line-height:1}
+.stat-num{font-family:var(--disp);font-size:28px;font-weight:300;line-height:1}
 .stat-lbl{font-size:11px;color:var(--ink4);margin-top:4px}
 .mini-bars{display:flex;align-items:flex-end;gap:4px;height:64px;margin:10px 0 4px}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
 .bar-seg{width:100%;border-radius:3px 3px 0 0;min-height:3px}
 .bar-txt{font-size:9px;color:var(--ink4)}
 .bar-num{font-size:9px;font-weight:600}
-
 .day-lbl{font-size:11px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 6px}
-.empty{text-align:center;padding:52px 20px;color:var(--ink4)}
-.empty-ico{font-size:36px;margin-bottom:10px}
-.empty p{font-size:14px}
 
 /* Bottom nav */
 .bnav{display:flex;background:var(--paper);border-top:1px solid var(--paper3);padding-bottom:var(--sab);flex-shrink:0}
@@ -142,46 +128,52 @@ body{font-family:var(--font-body);background:var(--paper);color:var(--ink);heigh
 .nav-ico{font-size:20px;line-height:1}
 .nav-lbl{font-size:10px;margin-top:2px;font-weight:500}
 
-/* Overlays / Sheets */
+/* Overlay / Sheet */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s;pointer-events:none}
 .overlay.open{opacity:1;pointer-events:auto}
-.sheet{background:var(--paper);width:100%;max-width:500px;border-radius:var(--r-xl) var(--r-xl) 0 0;padding:22px calc(20px + var(--sar)) calc(20px + var(--sab)) calc(20px + var(--sal));transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:90vh;overflow-y:auto}
+.sheet{background:var(--paper);width:100%;max-width:500px;border-radius:var(--r-xl) var(--r-xl) 0 0;padding:22px calc(20px + var(--sar)) calc(20px + var(--sab)) calc(20px + var(--sal));transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
 .sheet::-webkit-scrollbar{display:none}
 .overlay.open .sheet{transform:translateY(0)}
 .s-handle{width:36px;height:4px;background:var(--paper3);border-radius:2px;margin:0 auto 20px}
-.s-title{font-family:var(--font-disp);font-size:22px;font-weight:300;margin-bottom:4px}
+.s-title{font-family:var(--disp);font-size:22px;font-weight:300;margin-bottom:4px}
 .s-sub{font-size:13px;color:var(--ink3);margin-bottom:18px}
+.s-section{margin-bottom:18px}
+.s-label{font-size:12px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 
-/* Form */
+/* Form elements */
 .sl-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .sl-row label{font-size:13px;color:var(--ink3);width:54px;flex-shrink:0}
 .sl-row input[type=range]{flex:1;accent-color:var(--green);height:4px}
-.sl-val{font-family:var(--font-disp);font-size:16px;font-weight:300;width:48px;text-align:right}
+.sl-val{font-family:var(--disp);font-size:16px;font-weight:300;width:48px;text-align:right}
 
-select,input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2);color:var(--ink);font-size:14px;font-family:var(--font-body);margin-bottom:12px;-webkit-appearance:none;appearance:none}
+select,input[type=text],input[type=datetime-local]{width:100%;padding:12px 14px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2);color:var(--ink);font-size:14px;font-family:var(--body);margin-bottom:12px;-webkit-appearance:none;appearance:none}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a89a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
+select:focus,input:focus{outline:none;border-color:var(--green)}
 
-.g-input{width:100%;padding:18px;font-family:var(--font-disp);font-size:36px;font-weight:300;text-align:center;letter-spacing:-1px;border:1.5px solid var(--paper3);border-radius:var(--r-md);background:var(--paper2);color:var(--ink);-webkit-appearance:none;appearance:none}
+.g-input{width:100%;padding:18px;font-family:var(--disp);font-size:36px;font-weight:300;text-align:center;letter-spacing:-1px;border:1.5px solid var(--paper3);border-radius:var(--r-md);background:var(--paper2);color:var(--ink);-webkit-appearance:none;appearance:none}
 .g-ref{font-size:12px;color:var(--ink4);text-align:center;margin-top:6px}
 .feedback{border-radius:var(--r-sm);padding:10px 14px;font-size:13px;font-weight:500;text-align:center;margin:10px 0}
-.feedback.green{background:var(--green-light);color:var(--green)}
-.feedback.amber{background:var(--amber-light);color:var(--amber)}
-.feedback.red{background:var(--red-light);color:var(--red)}
+.feedback.green{background:var(--green-l);color:var(--green)}
+.feedback.amber{background:var(--amber-l);color:var(--amber)}
+.feedback.red{background:var(--red-l);color:var(--red)}
 
-.btn-p{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--r-md);padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:transform .12s,opacity .12s;box-shadow:0 3px 12px rgba(45,90,61,.22)}
-.btn-p:active{transform:scale(.97);opacity:.9}
-.btn-g{width:100%;background:transparent;color:var(--ink3);border:none;padding:12px;font-size:14px;cursor:pointer;margin-top:4px;font-family:var(--font-body)}
-.btn-d{width:100%;background:transparent;color:var(--red);border:1px solid rgba(185,28,28,.22);border-radius:var(--r-md);padding:12px;font-size:14px;cursor:pointer;margin-top:8px;font-family:var(--font-body)}
-
-.meal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.meal-c{padding:16px 12px;border:1px solid var(--paper3);border-radius:var(--r-md);background:var(--paper2);cursor:pointer;text-align:center;font-size:15px;font-weight:500;color:var(--ink2);transition:all .14s;-webkit-appearance:none;font-family:var(--font-body)}
-.meal-c:active,.meal-c.sel{border:2px solid var(--green);background:var(--green-light);color:var(--green)}
-
-.edit-sec{margin-bottom:16px}
-.edit-sec-lbl{font-size:12px;font-weight:600;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.num-input{width:100%;padding:12px 14px;font-family:var(--font-disp);font-size:20px;font-weight:300;text-align:center;letter-spacing:-.5px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2);color:var(--ink);-webkit-appearance:none;appearance:none;margin-bottom:12px}
+.num-input{width:100%;padding:12px 14px;font-family:var(--disp);font-size:22px;font-weight:300;text-align:center;letter-spacing:-.5px;border:1px solid var(--paper3);border-radius:var(--r-sm);background:var(--paper2);color:var(--ink);-webkit-appearance:none;appearance:none;margin-bottom:12px}
 .num-input:focus{outline:none;border-color:var(--green)}
+
+/* Buttons */
+.btn-p{width:100%;background:var(--green);color:#fff;border:none;border-radius:var(--r-md);padding:16px;font-size:16px;font-weight:600;cursor:pointer;font-family:var(--body);transition:transform .12s,opacity .12s;box-shadow:0 3px 12px rgba(45,90,61,.22)}
+.btn-p:active{transform:scale(.97);opacity:.9}
+.btn-g{width:100%;background:transparent;color:var(--ink3);border:none;padding:12px;font-size:14px;cursor:pointer;margin-top:4px;font-family:var(--body)}
+.btn-d{width:100%;background:transparent;color:var(--red);border:1px solid rgba(185,28,28,.22);border-radius:var(--r-md);padding:12px;font-size:14px;cursor:pointer;margin-top:8px;font-family:var(--body)}
+
+/* Meal grid */
+.meal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.meal-c{padding:16px 12px;border:1px solid var(--paper3);border-radius:var(--r-md);background:var(--paper2);cursor:pointer;text-align:center;font-size:15px;font-weight:500;color:var(--ink2);transition:all .14s;-webkit-appearance:none;font-family:var(--body)}
+.meal-c:active,.meal-c.sel{border:2px solid var(--green);background:var(--green-l);color:var(--green)}
+
+.empty{text-align:center;padding:52px 20px;color:var(--ink4)}
+.empty-ico{font-size:36px;margin-bottom:10px}
+.empty p{font-size:14px}
 </style>
 </head>
 <body>
@@ -193,25 +185,19 @@ select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
     </div>
   </div>
   <div class="tabs">
-    <div class="tab active" id="tab-home"    onclick="switchPage('home')">記録</div>
-    <div class="tab"        id="tab-history" onclick="switchPage('history')">履歴</div>
-    <div class="tab"        id="tab-stats"   onclick="switchPage('stats')">統計</div>
+    <div class="tab active"  id="tab-home"    onclick="switchPage('home')">記録</div>
+    <div class="tab"         id="tab-history" onclick="switchPage('history')">履歴</div>
+    <div class="tab"         id="tab-stats"   onclick="switchPage('stats')">統計</div>
   </div>
   <div id="scr">
-
     <!-- HOME -->
     <div class="page active" id="page-home">
       <div id="nBanner" style="display:none" class="n-banner">
         <span>🔔</span><span>通知を有効にすると2時間後に自動で提醒します</span>
         <button onclick="reqNotify()">許可する</button>
       </div>
-      <div id="alarmCard" style="display:none" class="alarm-card">
-        <div class="alarm-meal" id="alarmTag"></div>
-        <div class="alarm-cd"   id="cd">--:--</div>
-        <div class="alarm-sub"  id="remindAt"></div>
-        <button class="btn-p" style="margin-bottom:10px" onclick="openGlucose('post')">食後血糖を記録する</button>
-        <button class="btn-g" onclick="cancelAlarm()">この提醒をキャンセル</button>
-      </div>
+      <!-- Multiple alarm cards rendered here -->
+      <div id="alarmCards"></div>
       <button class="hero-btn" onclick="tapEaten()">
         <div class="hero-l">🍚</div>
         <div class="hero-r">
@@ -219,16 +205,14 @@ select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
           <div class="hero-sub">タップして食事時刻を記録<br>2時間後に測定提醒</div>
         </div>
       </button>
-      <button class="sec-btn" onclick="openGlucose('fasting')">💉 空腹時血糖を記録</button>
+      <button class="sec-btn" onclick="openGlucose('fasting',null)">💉 空腹時血糖を記録</button>
+      <button class="sec-btn" onclick="openManualAdd()">✏️ 過去の記録を手動追加</button>
       <div id="todayS"></div>
     </div>
-
     <!-- HISTORY -->
     <div class="page" id="page-history"><div id="histS"></div></div>
-
     <!-- STATS -->
     <div class="page" id="page-stats"><div id="statS"></div></div>
-
   </div>
   <div class="bnav">
     <div class="nav-i active" id="nav-home"    onclick="switchPage('home')">   <div class="nav-ico">🏠</div><div class="nav-lbl">記録</div></div>
@@ -237,12 +221,12 @@ select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
   </div>
 </div>
 
-<!-- Sheet: meal type -->
+<!-- Sheet: meal type picker -->
 <div class="overlay" id="shMeal">
   <div class="sheet">
     <div class="s-handle"></div>
     <div class="s-title">何の食事ですか？</div>
-    <div class="s-sub" id="mealTime"></div>
+    <div class="s-sub" id="mealSheetTime"></div>
     <div class="meal-grid">
       <button class="meal-c" onclick="pickMeal('朝食')">🌅 朝食</button>
       <button class="meal-c" onclick="pickMeal('昼食')">☀️ 昼食</button>
@@ -289,12 +273,12 @@ select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
     <div style="font-size:48px;margin-bottom:10px">⏰</div>
     <div class="s-title">測定の時間です</div>
     <div class="s-sub" id="remindInfo" style="margin-bottom:20px"></div>
-    <button class="btn-p" onclick="closeSheet('shRemind');openGlucose('post')">今すぐ記録する</button>
+    <button class="btn-p" onclick="closeSheet('shRemind');openGlucose('post',remindCtxId)">今すぐ記録する</button>
     <button class="btn-g" onclick="snooze()">10分後に再提醒</button>
   </div>
 </div>
 
-<!-- Sheet: edit -->
+<!-- Sheet: edit record -->
 <div class="overlay" id="shEdit">
   <div class="sheet">
     <div class="s-handle"></div>
@@ -307,343 +291,524 @@ select:focus,input:focus,.g-input:focus{outline:none;border-color:var(--green)}
   </div>
 </div>
 
+<!-- Sheet: manual add -->
+<div class="overlay" id="shManual">
+  <div class="sheet">
+    <div class="s-handle"></div>
+    <div class="s-title">記録を手動追加</div>
+    <div class="s-sub">過去の食事・血糖値を追加できます</div>
+    <div class="s-section">
+      <div class="s-label">食事の種類</div>
+      <select id="manualType">
+        <option value="meal-朝食">🌅 朝食</option>
+        <option value="meal-昼食">☀️ 昼食</option>
+        <option value="meal-夕食">🌙 夕食</option>
+        <option value="meal-間食">🍎 間食</option>
+        <option value="fasting">💉 空腹時</option>
+      </select>
+    </div>
+    <div class="s-section">
+      <div class="s-label">食事時刻</div>
+      <input type="datetime-local" id="manualTime">
+    </div>
+    <div class="s-section">
+      <div class="s-label">血糖値 (mg/dL) — 任意</div>
+      <input class="num-input" type="number" id="manualGlucose" placeholder="未測定の場合は空欄" step="1" min="20" max="600" inputmode="decimal">
+    </div>
+    <div class="s-section">
+      <div class="s-label">糖質 (g) — 任意</div>
+      <input class="num-input" type="number" id="manualCarb" placeholder="—" step="10" min="0" max="300" inputmode="decimal">
+    </div>
+    <input type="text" id="manualNote" placeholder="メモ（任意）">
+    <button class="btn-p" onclick="saveManual()">追加</button>
+    <button class="btn-g" onclick="closeSheet('shManual')">キャンセル</button>
+  </div>
+</div>
+
 <script>
-// ── Storage keys ────────────────────────────────────────────────
-var DB  = 'glu_records_v3';
-var ALM = 'glu_alarm_v3';
+// ── Storage ─────────────────────────────────────────────────────
+var DB   = 'glu_recs_v4';
+var ALMK = 'glu_alarms_v4';  // now stores array of {recId, remindAt}
 
 // ── State ────────────────────────────────────────────────────────
-var recs = [];
-var alarm = null;          // { recId, remindAt:ms } persisted separately
-var aTO = null, aCI = null, sTO = null;
-var gCtx = { type:null, recId:null };
+var recs   = [];
+var alarms = [];   // [{ recId, remindAt }]  — one per pending meal
+var timers = {};   // { recId: { aTO, aCI } }
+var gCtx   = { type: null, recId: null };
+var remindCtxId = null;
 var editId = null;
 var pendingTime = null, pendingType = null;
 
 // ── Persistence ──────────────────────────────────────────────────
 function load() {
-  try { var r=localStorage.getItem(DB); if(r) recs=JSON.parse(r); } catch(e){ recs=[]; }
-  recs.forEach(function(r){
-    r.mealTime=r.mealTime?+r.mealTime:0;
-    if(r.glucose&&r.glucose.time) r.glucose.time=+r.glucose.time;
-  });
+  try { var r = localStorage.getItem(DB); if (r) recs = JSON.parse(r); } catch(e) { recs = []; }
+  recs.forEach(function(r) { r.mealTime = r.mealTime ? +r.mealTime : 0; if (r.glucose && r.glucose.time) r.glucose.time = +r.glucose.time; });
 }
-function save() { try{localStorage.setItem(DB,JSON.stringify(recs));}catch(e){} }
-function loadAlm() { try{var r=localStorage.getItem(ALM);return r?JSON.parse(r):null;}catch(e){return null;} }
-function saveAlm(a) { try{if(a)localStorage.setItem(ALM,JSON.stringify(a));else localStorage.removeItem(ALM);}catch(e){} }
+function save() { try { localStorage.setItem(DB, JSON.stringify(recs)); } catch(e) {} }
+function loadAlms() { try { var r = localStorage.getItem(ALMK); return r ? JSON.parse(r) : []; } catch(e) { return []; } }
+function saveAlms() { try { localStorage.setItem(ALMK, JSON.stringify(alarms)); } catch(e) {} }
 
 // ── Helpers ──────────────────────────────────────────────────────
-function $(id){return document.getElementById(id)}
-function updS(id,v,u){$(id).textContent=v+u}
-function fmtT(ms){var d=new Date(ms);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
-function fmtD(ms){
-  var d=new Date(ms),n=new Date();
-  if(d.toDateString()===n.toDateString()) return '今日';
-  if(d.getFullYear()===n.getFullYear()) return (d.getMonth()+1)+'月'+d.getDate()+'日';
-  return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
+function $(id) { return document.getElementById(id); }
+function updS(id, v, u) { $(id).textContent = v + u; }
+function fmtT(ms) { var d = new Date(ms); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function fmtDT(ms) { var d = new Date(ms); return (d.getMonth()+1) + '/' + d.getDate() + ' ' + fmtT(ms); }
+function fmtD(ms) {
+  var d = new Date(ms), n = new Date();
+  if (d.toDateString() === n.toDateString()) return '今日';
+  if (d.getFullYear() === n.getFullYear()) return (d.getMonth()+1) + '月' + d.getDate() + '日';
+  return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate();
 }
-function byId(id){return recs.find(function(r){return r.id===id;})||null}
-
-function openSheet(id){$(id).classList.add('open');document.body.style.overflow='hidden'}
-function closeSheet(id){$(id).classList.remove('open');document.body.style.overflow=''}
+function toLocalISO(ms) {
+  var d = new Date(ms), z = function(n){return String(n).padStart(2,'0')};
+  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())+'T'+z(d.getHours())+':'+z(d.getMinutes());
+}
+function byId(id) { return recs.find(function(r) { return r.id === id; }) || null; }
+function openSheet(id) { $(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeSheet(id) { $(id).classList.remove('open'); document.body.style.overflow = ''; }
 
 // ── Nav ──────────────────────────────────────────────────────────
-function switchPage(n){
-  ['home','history','stats'].forEach(function(x){
-    $('page-'+x).classList.toggle('active',x===n);
-    $('tab-'+x).classList.toggle('active',x===n);
-    $('nav-'+x).classList.toggle('active',x===n);
+function switchPage(n) {
+  ['home','history','stats'].forEach(function(x) {
+    $('page-'+x).classList.toggle('active', x===n);
+    $('tab-'+x).classList.toggle('active', x===n);
+    $('nav-'+x).classList.toggle('active', x===n);
   });
-  if(n==='history') renderHist();
-  if(n==='stats')   renderStat();
+  if (n === 'history') renderHist();
+  if (n === 'stats')   renderStat();
 }
 
-// ── Header ───────────────────────────────────────────────────────
-function initHeader(){
-  var d=new Date(), days=['日','月','火','水','木','金','土'];
-  $('hdrDate').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
+function initHeader() {
+  var d = new Date(), days = ['日','月','火','水','木','金','土'];
+  $('hdrDate').textContent = (d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
 }
 
 // ── Notifications ────────────────────────────────────────────────
-function checkBanner(){if('Notification'in window&&Notification.permission==='default')$('nBanner').style.display='flex'}
-function reqNotify(){
-  if(!('Notification'in window)){alert('このブラウザは通知に対応していません');return}
-  Notification.requestPermission().then(function(p){if(p==='granted')$('nBanner').style.display='none'});
+function checkBanner() { if ('Notification' in window && Notification.permission === 'default') $('nBanner').style.display = 'flex'; }
+function reqNotify() {
+  if (!('Notification' in window)) { alert('このブラウザは通知に対応していません'); return; }
+  Notification.requestPermission().then(function(p) { if (p === 'granted') $('nBanner').style.display = 'none'; });
 }
 
-// ── Meal flow ────────────────────────────────────────────────────
-function guessType(h){return h>=5&&h<10?'朝食':h>=11&&h<14?'昼食':h>=17&&h<21?'夕食':null}
+// ── Alarm management (multi) ──────────────────────────────────────
+/*
+  alarms[] is the source of truth for which records are pending.
+  Each entry: { recId, remindAt }.
+  timers{} holds live { aTO, aCI } per recId.
+  On any change to alarms[], call saveAlms() + renderAlarmCards().
+*/
 
-function tapEaten(){
-  pendingTime=Date.now();
-  var g=guessType(new Date(pendingTime).getHours());
-  if(g){pendingType=g;openSheet('shFood');}
-  else{$('mealTime').textContent='現在 '+fmtT(pendingTime)+' — 通常の食事時間外です';openSheet('shMeal');}
-}
-function pickMeal(t){pendingType=t;closeSheet('shMeal');openSheet('shFood')}
-
-function saveFood(){
-  var food={carb:+$('cS').value,prot:+$('pS').value,veg:+$('vS').value,feeling:$('feelSel').value,note:$('foodNote').value.trim()};
-  closeSheet('shFood');createRec(food);resetFood();
-}
-function skipFood(){closeSheet('shFood');createRec(null);resetFood()}
-function resetFood(){$('cS').value=100;updS('cV',100,'g');$('pS').value=60;updS('pV',60,'g');$('vS').value=150;updS('vV',150,'g');$('feelSel').value='';$('foodNote').value=''}
-
-function createRec(food){
-  var remindAt=pendingTime+2*3600*1000;
-  var rec={id:Date.now(),type:'meal',mealType:pendingType,mealTime:pendingTime,remindAt:remindAt,food:food,glucose:null,cancelled:false};
-  recs.unshift(rec);save();
-  startAlarm(rec);renderToday();
+function addAlarm(rec) {
+  // Remove any existing alarm for same recId (shouldn't happen, but defensive)
+  removeAlarmEntry(rec.id);
+  var entry = { recId: rec.id, remindAt: rec.remindAt };
+  alarms.push(entry);
+  saveAlms();
+  startTimer(entry, rec);
+  renderAlarmCards();
 }
 
-// ── Alarm ────────────────────────────────────────────────────────
-function startAlarm(rec){
-  clearTimers();
-  alarm={recId:rec.id,remindAt:rec.remindAt};
-  saveAlm(alarm);
-  var ms=rec.remindAt-Date.now();
-  if(ms>0){
-    aTO=setTimeout(function(){fireRemind(rec.id)},ms);
-    aCI=setInterval(tickCD,1000);
-    nativeNotify(rec,ms);
+function removeAlarmEntry(recId) {
+  stopTimer(recId);
+  alarms = alarms.filter(function(a) { return a.recId !== recId; });
+  saveAlms();
+}
+
+function cancelOneAlarm(recId) {
+  var rec = byId(recId);
+  if (rec) { rec.cancelled = true; save(); }
+  removeAlarmEntry(recId);
+  renderAlarmCards();
+  renderToday();
+}
+
+function startTimer(entry, rec) {
+  stopTimer(entry.recId);
+  var ms = entry.remindAt - Date.now();
+  if (ms <= 0) { fireRemind(entry.recId); return; }
+  var aTO = setTimeout(function() { fireRemind(entry.recId); }, ms);
+  var aCI = setInterval(function() { tickCD(entry.recId); }, 1000);
+  timers[entry.recId] = { aTO: aTO, aCI: aCI };
+  nativeNotify(rec || byId(entry.recId), ms);
+}
+
+function stopTimer(recId) {
+  if (timers[recId]) {
+    clearTimeout(timers[recId].aTO);
+    clearInterval(timers[recId].aCI);
+    delete timers[recId];
   }
-  renderAlarm();
 }
 
-function nativeNotify(rec,ms){
-  if(!('Notification'in window)||Notification.permission!=='granted') return;
-  setTimeout(function(){try{new Notification('⏰ 測定の時間です',{body:rec.mealType+'から2時間が経過しました',icon:'icon-192.png',tag:'glu'})}catch(e){}},ms);
+function tickCD(recId) {
+  var el = $('cd-' + recId);
+  if (!el) { stopTimer(recId); return; }
+  var a = alarms.find(function(x) { return x.recId === recId; });
+  if (!a) { stopTimer(recId); return; }
+  var d = a.remindAt - Date.now();
+  if (d <= 0) { el.textContent = '時間です'; stopTimer(recId); return; }
+  var h = Math.floor(d/3600000), m = Math.floor((d%3600000)/60000), s = Math.floor((d%60000)/1000);
+  el.textContent = h > 0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
 }
 
-function cancelAlarm(){
-  clearTimers();
-  if(alarm){var r=byId(alarm.recId);if(r){r.cancelled=true;save();}}
-  alarm=null;saveAlm(null);
-  $('alarmCard').style.display='none';
+function nativeNotify(rec, ms) {
+  if (!rec || !('Notification' in window) || Notification.permission !== 'granted') return;
+  setTimeout(function() {
+    try { new Notification('⏰ 測定の時間です', { body: rec.mealType + 'から2時間経過しました', icon: 'icon-192.png', tag: 'glu-' + rec.id }); } catch(e) {}
+  }, ms);
 }
 
-function clearTimers(){
-  if(aTO){clearTimeout(aTO);aTO=null}
-  if(aCI){clearInterval(aCI);aCI=null}
-  if(sTO){clearTimeout(sTO);sTO=null}
+function fireRemind(recId) {
+  stopTimer(recId);
+  var rec = byId(recId);
+  if (!rec || rec.glucose || rec.cancelled) {
+    removeAlarmEntry(recId);
+    renderAlarmCards();
+    return;
+  }
+  remindCtxId = recId;
+  $('remindInfo').textContent = (rec.mealType || '') + ' ' + fmtT(rec.mealTime) + ' から2時間経過しました';
+  openSheet('shRemind');
 }
 
-function renderAlarm(){
-  if(!alarm){$('alarmCard').style.display='none';return}
-  var rec=byId(alarm.recId);
-  if(!rec||rec.cancelled||rec.glucose||alarm.remindAt<=Date.now()){$('alarmCard').style.display='none';return}
-  $('alarmCard').style.display='block';
-  $('alarmTag').textContent=rec.mealType+' — タイマー進行中';
-  $('remindAt').textContent=fmtT(rec.remindAt)+' に測定提醒';
-  tickCD();
+function snooze() {
+  closeSheet('shRemind');
+  var id = remindCtxId;
+  // Push remindAt forward 10 min in alarms list (just fire again after 10min)
+  setTimeout(function() { fireRemind(id); }, 10 * 60 * 1000);
 }
 
-function tickCD(){
-  if(!alarm){return}
-  var d=alarm.remindAt-Date.now();
-  if(d<=0){$('cd').textContent='時間です';clearInterval(aCI);return}
-  var h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);
-  $('cd').textContent=h>0?h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'):m+':'+String(s).padStart(2,'0');
+// ── Render alarm cards ────────────────────────────────────────────
+function renderAlarmCards() {
+  var container = $('alarmCards');
+  if (!alarms.length) { container.innerHTML = ''; return; }
+  var html = '';
+  alarms.forEach(function(a) {
+    var rec = byId(a.recId);
+    if (!rec || rec.cancelled || rec.glucose) return;
+    var d = a.remindAt - Date.now();
+    if (d <= 0) return;
+    var h = Math.floor(d/3600000), m = Math.floor((d%3600000)/60000), s = Math.floor((d%60000)/1000);
+    var cdStr = h > 0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
+    html += '<div class="alarm-card">';
+    html += '<div class="alarm-meal">' + (rec.mealType||'') + ' — タイマー進行中</div>';
+    html += '<div class="alarm-cd" id="cd-' + a.recId + '">' + cdStr + '</div>';
+    html += '<div class="alarm-sub">' + fmtT(a.remindAt) + ' に測定提醒</div>';
+    html += '<div class="alarm-actions">';
+    html += '<button class="btn-p" onclick="openGlucose(\'post\',' + a.recId + ')">食後血糖を記録</button>';
+    html += '<button class="alarm-actions btn-g-sm" onclick="cancelOneAlarm(' + a.recId + ')" title="キャンセル">✕</button>';
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
 }
 
-function fireRemind(recId){
-  clearInterval(aCI);$('alarmCard').style.display='none';
-  var rec=byId(recId);if(!rec)return;
-  $('remindInfo').textContent=rec.mealType+' '+fmtT(rec.mealTime)+' から2時間経過';
-  gCtx={type:'post',recId:recId};openSheet('shRemind');
-}
-function snooze(){closeSheet('shRemind');var id=gCtx.recId;sTO=setTimeout(function(){fireRemind(id)},10*60*1000)}
+// ── Meal recording flow ───────────────────────────────────────────
+function guessType(h) { return h>=5&&h<10?'朝食':h>=11&&h<14?'昼食':h>=17&&h<21?'夕食':null; }
 
-function restoreAlarm(){
-  var a=loadAlm();if(!a)return;
-  var rec=byId(a.recId);
-  if(!rec||rec.cancelled||rec.glucose){saveAlm(null);return}
-  if(a.remindAt<=Date.now()){saveAlm(null);alarm=a;fireRemind(a.recId);return}
-  alarm=a;
-  var ms=a.remindAt-Date.now();
-  aTO=setTimeout(function(){fireRemind(a.recId)},ms);
-  aCI=setInterval(tickCD,1000);
-  nativeNotify(rec,ms);
-  renderAlarm();
+function tapEaten() {
+  pendingTime = Date.now();
+  var g = guessType(new Date(pendingTime).getHours());
+  if (g) { pendingType = g; openSheet('shFood'); }
+  else { $('mealSheetTime').textContent = '現在 '+fmtT(pendingTime)+' — 通常の食事時間外です'; openSheet('shMeal'); }
+}
+function pickMeal(t) { pendingType = t; closeSheet('shMeal'); openSheet('shFood'); }
+
+function saveFood() {
+  var food = { carb:+$('cS').value, prot:+$('pS').value, veg:+$('vS').value, feeling:$('feelSel').value, note:$('foodNote').value.trim() };
+  closeSheet('shFood'); createRec(food); resetFood();
+}
+function skipFood() { closeSheet('shFood'); createRec(null); resetFood(); }
+function resetFood() { $('cS').value=100;updS('cV',100,'g');$('pS').value=60;updS('pV',60,'g');$('vS').value=150;updS('vV',150,'g');$('feelSel').value='';$('foodNote').value=''; }
+
+function createRec(food) {
+  var remindAt = pendingTime + 2 * 3600 * 1000;
+  var rec = { id:Date.now(), type:'meal', mealType:pendingType, mealTime:pendingTime, remindAt:remindAt, food:food, glucose:null, cancelled:false };
+  recs.unshift(rec); save();
+  addAlarm(rec);
+  renderToday();
 }
 
 // ── Glucose ──────────────────────────────────────────────────────
-function openGlucose(type,recId){
-  gCtx={type:type,recId:recId!==undefined?recId:(alarm?alarm.recId:null)};
-  if(type==='fasting'){$('gTitle').textContent='空腹時血糖';$('gSub').textContent='起床後・食事前の測定値を入力';$('gRef').textContent='基準値：70 – 110 mg/dL'}
-  else{$('gTitle').textContent='食後2時間血糖';$('gSub').textContent='最初の一口から2時間後の値';$('gRef').textContent='目標：140 mg/dL 未満'}
-  $('gInput').value='';$('gFb').style.display='none';
-  openSheet('shGlucose');
-  setTimeout(function(){try{$('gInput').focus()}catch(e){}},350);
-}
-
-function glvl(v,type){
-  if(type==='fasting') return v<70?'red':v<=110?'green':v<=126?'amber':'red';
-  return v<140?'green':v<200?'amber':'red';
-}
-function ghint(v,type){
-  if(type==='fasting'){
-    if(v<70)  return'⚠️ 低血糖 — 早めに糖分補給を';
-    if(v<=110)return'✅ 正常範囲';
-    if(v<=126)return'⚠️ やや高め — 食事管理に注意';
-    return'🚨 高血糖 — 医師への相談を推奨';
+function openGlucose(type, recId) {
+  gCtx = { type: type, recId: recId != null ? recId : null };
+  if (type === 'fasting') {
+    $('gTitle').textContent = '空腹時血糖'; $('gSub').textContent = '起床後・食事前の測定値を入力'; $('gRef').textContent = '基準値：70 – 110 mg/dL';
+  } else {
+    $('gTitle').textContent = '食後2時間血糖'; $('gSub').textContent = '最初の一口から2時間後の値'; $('gRef').textContent = '目標：140 mg/dL 未満';
   }
-  if(v<140) return'✅ 目標達成';
-  if(v<200) return'⚠️ やや高め — 食事内容を見直して';
-  return'🚨 高血糖 — 医師への相談を推奨';
+  $('gInput').value = ''; $('gFb').style.display = 'none';
+  openSheet('shGlucose');
+  setTimeout(function() { try { $('gInput').focus(); } catch(e) {} }, 350);
 }
 
-function saveGlucose(){
-  var v=parseInt($('gInput').value,10);
-  if(!v||v<20||v>600){fb('gFb','amber','有効な値を入力してください（20–600 mg/dL）');return}
-  var lvl=glvl(v,gCtx.type);
-  var hint=ghint(v,gCtx.type);
-  fb('gFb',lvl,hint);
-  var entry={val:v,time:Date.now(),level:lvl};
-  var rec=gCtx.recId?byId(gCtx.recId):null;
-  if(rec){rec.glucose=entry;save();}
-  else{recs.unshift({id:Date.now(),type:'fasting',mealType:'空腹',mealTime:Date.now(),food:null,glucose:entry,cancelled:false});save();}
+function glvl(v, type) { return type==='fasting' ? (v<70?'red':v<=110?'green':v<=126?'amber':'red') : (v<140?'green':v<200?'amber':'red'); }
+function ghint(v, type) {
+  if (type === 'fasting') {
+    if (v<70)  return '⚠️ 低血糖 — 早めに糖分補給を';
+    if (v<=110) return '✅ 正常範囲';
+    if (v<=126) return '⚠️ やや高め — 食事管理に注意';
+    return '🚨 高血糖 — 医師への相談を推奨';
+  }
+  if (v<140) return '✅ 目標達成';
+  if (v<200) return '⚠️ やや高め — 食事内容を見直して';
+  return '🚨 高血糖 — 医師への相談を推奨';
+}
+
+function saveGlucose() {
+  var v = parseInt($('gInput').value, 10);
+  if (!v || v < 20 || v > 600) { showFb('gFb','amber','有効な値を入力してください（20–600 mg/dL）'); return; }
+  var lvl = glvl(v, gCtx.type), hint = ghint(v, gCtx.type);
+  showFb('gFb', lvl, hint);
+  var entry = { val:v, time:Date.now(), level:lvl };
+  var rec = gCtx.recId ? byId(gCtx.recId) : null;
+  if (rec) { rec.glucose = entry; save(); }
+  else { recs.unshift({ id:Date.now(), type:'fasting', mealType:'空腹', mealTime:Date.now(), food:null, glucose:entry, cancelled:false }); save(); }
   renderToday();
-  setTimeout(function(){closeSheet('shGlucose');$('gFb').style.display='none';if(gCtx.type==='post')cancelAlarm();},1500);
+  setTimeout(function() {
+    closeSheet('shGlucose'); $('gFb').style.display = 'none';
+    // Only remove alarm for THIS record, not all alarms
+    if (gCtx.type === 'post' && gCtx.recId) {
+      removeAlarmEntry(gCtx.recId);
+      renderAlarmCards();
+    }
+  }, 1500);
 }
 
-function fb(id,cls,msg){var e=$(id);e.style.display='block';e.className='feedback '+cls;e.textContent=msg}
+function showFb(id, cls, msg) { var e=$(id); e.style.display='block'; e.className='feedback '+cls; e.textContent=msg; }
 
 // ── Edit / Delete ────────────────────────────────────────────────
-function openEdit(recId){
-  var rec=byId(recId);if(!rec)return;
-  editId=recId;
-  $('editTitle').textContent=(rec.mealType||'空腹')+'の記録';
-  $('editSub').textContent=fmtT(rec.mealTime)+(rec.food&&rec.food.note?' · '+rec.food.note:'');
-  var html='<div class="edit-sec"><div class="edit-sec-lbl">血糖値 (mg/dL)</div><input class="num-input" type="number" id="eG" placeholder="未記録" step="1" min="20" max="600" inputmode="decimal" value="'+(rec.glucose?rec.glucose.val:'')+'"></div>';
-  if(rec.food){
-    html+='<div class="edit-sec"><div class="edit-sec-lbl">糖質 (g)</div><input class="num-input" type="number" id="eC" step="10" min="0" max="300" inputmode="decimal" value="'+rec.food.carb+'"></div>';
-    html+='<div class="edit-sec"><div class="edit-sec-lbl">メモ</div><input type="text" id="eN" value="'+(rec.food.note||'')+'" placeholder="食品名など"></div>';
+function openEdit(recId) {
+  var rec = byId(recId); if (!rec) return;
+  editId = recId;
+  $('editTitle').textContent = (rec.mealType||'空腹') + 'の記録';
+  $('editSub').textContent = fmtDT(rec.mealTime);
+  var html = '';
+  // Meal time
+  html += '<div class="s-section"><div class="s-label">食事時刻</div><input type="datetime-local" id="eTime" value="' + toLocalISO(rec.mealTime) + '"></div>';
+  // Glucose
+  html += '<div class="s-section"><div class="s-label">血糖値 (mg/dL)</div><input class="num-input" type="number" id="eG" placeholder="未記録" step="1" min="20" max="600" inputmode="decimal" value="'+(rec.glucose?rec.glucose.val:'')+'"></div>';
+  // Meal type
+  html += '<div class="s-section"><div class="s-label">食事の種類</div><select id="eMT"><option value="朝食"'+(rec.mealType==='朝食'?' selected':'')+'>🌅 朝食</option><option value="昼食"'+(rec.mealType==='昼食'?' selected':'')+'>☀️ 昼食</option><option value="夕食"'+(rec.mealType==='夕食'?' selected':'')+'>🌙 夕食</option><option value="間食"'+(rec.mealType==='間食'?' selected':'')+'>🍎 間食</option><option value="空腹"'+(rec.mealType==='空腹'?' selected':'')+'>💉 空腹時</option></select></div>';
+  // Food
+  if (rec.food) {
+    html += '<div class="s-section"><div class="s-label">糖質 (g)</div><input class="num-input" type="number" id="eC" step="10" min="0" max="300" inputmode="decimal" value="'+rec.food.carb+'"></div>';
+    html += '<div class="s-section"><div class="s-label">メモ</div><input type="text" id="eN" value="'+(rec.food.note||'')+'" placeholder="食品名など"></div>';
   }
-  $('editBody').innerHTML=html;
+  $('editBody').innerHTML = html;
   openSheet('shEdit');
 }
 
-function saveEdit(){
-  var rec=byId(editId);if(!rec){closeSheet('shEdit');return}
-  var gv=parseInt($('eG').value,10);
-  if(gv&&gv>=20&&gv<=600){var lvl=glvl(gv,rec.type==='fasting'?'fasting':'post');rec.glucose={val:gv,time:rec.glucose?rec.glucose.time:Date.now(),level:lvl};}
-  else if(!$('eG').value) rec.glucose=null;
-  var eC=$('eC'),eN=$('eN');
-  if(rec.food){if(eC)rec.food.carb=parseInt(eC.value,10)||0;if(eN)rec.food.note=eN.value.trim();}
-  save();closeSheet('shEdit');renderToday();
-  if($('page-history').classList.contains('active'))renderHist();
-  if($('page-stats').classList.contains('active'))renderStat();
+function saveEdit() {
+  var rec = byId(editId); if (!rec) { closeSheet('shEdit'); return; }
+  // Meal time
+  var tEl = $('eTime');
+  if (tEl && tEl.value) {
+    var newTime = new Date(tEl.value).getTime();
+    if (!isNaN(newTime)) {
+      rec.mealTime = newTime;
+      // Update remindAt and alarm entry if alarm still active
+      var newRemind = newTime + 2 * 3600 * 1000;
+      rec.remindAt = newRemind;
+      var aEntry = alarms.find(function(a) { return a.recId === rec.id; });
+      if (aEntry) {
+        aEntry.remindAt = newRemind;
+        saveAlms();
+        // Restart timer with new time
+        stopTimer(rec.id);
+        startTimer(aEntry, rec);
+        renderAlarmCards();
+      }
+    }
+  }
+  // Meal type
+  var mtEl = $('eMT'); if (mtEl) rec.mealType = mtEl.value;
+  // Glucose
+  var gv = parseInt(($('eG')||{}).value, 10);
+  if (gv && gv >= 20 && gv <= 600) { var lvl = glvl(gv, rec.type==='fasting'?'fasting':'post'); rec.glucose = { val:gv, time:rec.glucose?rec.glucose.time:Date.now(), level:lvl }; }
+  else if (!($('eG')||{}).value) rec.glucose = null;
+  // Food
+  var eC = $('eC'), eN = $('eN');
+  if (rec.food) { if (eC) rec.food.carb = parseInt(eC.value,10)||0; if (eN) rec.food.note = eN.value.trim(); }
+  save(); closeSheet('shEdit'); renderToday();
+  if ($('page-history').classList.contains('active')) renderHist();
+  if ($('page-stats').classList.contains('active'))   renderStat();
 }
 
-function delRecord(){
-  if(!confirm('この記録を削除しますか？'))return;
-  var idx=recs.findIndex(function(r){return r.id===editId});
-  if(idx!==-1)recs.splice(idx,1);
-  if(alarm&&alarm.recId===editId){clearTimers();alarm=null;saveAlm(null);$('alarmCard').style.display='none';}
-  save();closeSheet('shEdit');renderToday();
-  if($('page-history').classList.contains('active'))renderHist();
-  if($('page-stats').classList.contains('active'))renderStat();
+function delRecord() {
+  if (!confirm('この記録を削除しますか？')) return;
+  // Also remove alarm if exists
+  removeAlarmEntry(editId);
+  var idx = recs.findIndex(function(r) { return r.id === editId; });
+  if (idx !== -1) recs.splice(idx, 1);
+  save(); closeSheet('shEdit'); renderAlarmCards(); renderToday();
+  if ($('page-history').classList.contains('active')) renderHist();
+  if ($('page-stats').classList.contains('active'))   renderStat();
 }
 
-// ── Render helpers ───────────────────────────────────────────────
-function colFor(g){return{green:'var(--green)',amber:'var(--amber)',red:'var(--red)'}[g.level]||'var(--ink)'}
+// ── Manual add ───────────────────────────────────────────────────
+function openManualAdd() {
+  // Default datetime = now
+  $('manualTime').value = toLocalISO(Date.now());
+  $('manualGlucose').value = '';
+  $('manualCarb').value = '';
+  $('manualNote').value = '';
+  openSheet('shManual');
+}
 
-function recRowHTML(r,showEdit){
-  var g=r.glucose, isFast=r.type==='fasting';
-  var html='<div class="rec-row">';
-  html+='<div class="rec-ico" style="background:'+(isFast?'var(--amber-light)':'var(--green-light)')+'">'+( isFast?'💉':'🍚')+'</div>';
-  html+='<div class="rec-info"><div class="rec-name">'+(r.mealType||'空腹')+'</div>';
-  html+='<div class="rec-meta">'+fmtT(r.mealTime);
-  if(r.remindAt&&!r.cancelled&&!g) html+=' · 提醒 '+fmtT(r.remindAt);
-  if(r.food&&r.food.carb) html+=' · 糖質 '+r.food.carb+'g';
-  if(r.food&&r.food.note) html+=' · '+r.food.note;
-  html+='</div></div>';
-  html+='<div class="rec-actions">';
-  if(g) html+='<div class="rec-val"><div class="rec-num" style="color:'+colFor(g)+'">'+g.val+'</div><div class="rec-unit">mg/dL</div></div>';
-  else  html+='<button class="pill" onclick="openGlucose(\'post\','+r.id+')">記録</button>';
-  if(showEdit) html+='<button class="pill" onclick="openEdit('+r.id+')">編集</button>';
-  html+='</div></div>';
+function saveManual() {
+  var typeVal = $('manualType').value;
+  var isMeal = typeVal.startsWith('meal-');
+  var mealType = isMeal ? typeVal.replace('meal-','') : '空腹';
+  var timeVal = $('manualTime').value;
+  if (!timeVal) { alert('食事時刻を入力してください'); return; }
+  var mealTime = new Date(timeVal).getTime();
+  if (isNaN(mealTime)) { alert('正しい日時を入力してください'); return; }
+
+  var gv = parseInt($('manualGlucose').value, 10);
+  var glucose = (gv && gv >= 20 && gv <= 600) ? { val:gv, time:mealTime + (isMeal ? 2*3600*1000 : 0), level:glvl(gv, isMeal?'post':'fasting') } : null;
+  var carb = parseInt($('manualCarb').value, 10);
+  var food = isMeal && carb ? { carb:carb, prot:0, veg:0, feeling:'', note:$('manualNote').value.trim() } : null;
+  if (!food && $('manualNote').value.trim()) { food = { carb:0, prot:0, veg:0, feeling:'', note:$('manualNote').value.trim() }; }
+
+  var rec = {
+    id: Date.now(), type: isMeal ? 'meal' : 'fasting',
+    mealType: mealType, mealTime: mealTime,
+    remindAt: isMeal ? mealTime + 2*3600*1000 : null,
+    food: food, glucose: glucose, cancelled: true  // manual = no live alarm
+  };
+  recs.unshift(rec);
+  recs.sort(function(a,b){ return b.mealTime - a.mealTime; });
+  save(); closeSheet('shManual'); renderToday();
+  if ($('page-history').classList.contains('active')) renderHist();
+}
+
+// ── Render helpers ────────────────────────────────────────────────
+var COLS = { green:'var(--green)', amber:'var(--amber)', red:'var(--red)' };
+function colFor(g) { return COLS[g.level] || 'var(--ink)'; }
+
+function recRowHTML(r) {
+  var g = r.glucose, isFast = r.type === 'fasting';
+  var alarmActive = alarms.some(function(a) { return a.recId === r.id; });
+  var html = '<div class="rec-row">';
+  html += '<div class="rec-ico" style="background:' + (isFast?'var(--amber-l)':'var(--green-l)') + '">' + (isFast?'💉':'🍚') + '</div>';
+  html += '<div class="rec-info"><div class="rec-name">' + (r.mealType||'空腹') + '</div>';
+  html += '<div class="rec-meta">' + fmtT(r.mealTime);
+  if (r.remindAt && alarmActive && !g) html += ' · 提醒 ' + fmtT(r.remindAt);
+  if (r.food && r.food.carb) html += ' · 糖質 ' + r.food.carb + 'g';
+  if (r.food && r.food.note) html += ' · ' + r.food.note;
+  html += '</div></div>';
+  html += '<div class="rec-right">';
+  if (g) {
+    html += '<div class="rec-val"><div class="rec-num" style="color:'+colFor(g)+'">'+g.val+'</div><div class="rec-unit">mg/dL</div></div>';
+  } else {
+    html += '<button class="pill" onclick="openGlucose(\'post\','+r.id+')">記録</button>';
+  }
+  html += '<button class="pill" onclick="openEdit('+r.id+')">編集</button>';
+  html += '</div></div>';
   return html;
 }
 
 // ── Render: Today ────────────────────────────────────────────────
-function renderToday(){
-  var ts=new Date().toDateString();
-  var today=recs.filter(function(r){return new Date(r.mealTime).toDateString()===ts});
-  if(!today.length){$('todayS').innerHTML='';return}
-  var html='<div class="card"><div class="card-lbl">今日</div>';
-  today.forEach(function(r){html+=recRowHTML(r,true)});
-  html+='</div>';
-  $('todayS').innerHTML=html;
+function renderToday() {
+  var ts = new Date().toDateString();
+  var today = recs.filter(function(r) { return new Date(r.mealTime).toDateString() === ts; });
+  if (!today.length) { $('todayS').innerHTML = ''; return; }
+  var html = '<div class="card"><div class="card-lbl">今日</div>';
+  today.forEach(function(r) { html += recRowHTML(r); });
+  html += '</div>';
+  $('todayS').innerHTML = html;
 }
 
 // ── Render: History ──────────────────────────────────────────────
-function renderHist(){
-  if(!recs.length){$('histS').innerHTML='<div class="empty"><div class="empty-ico">📋</div><p>記録がありません</p></div>';return}
-  var grouped={},order=[];
-  recs.forEach(function(r){
-    var k=new Date(r.mealTime).toDateString();
-    if(!grouped[k]){grouped[k]={lbl:fmtD(r.mealTime),items:[]};order.push(k)}
+function renderHist() {
+  if (!recs.length) { $('histS').innerHTML = '<div class="empty"><div class="empty-ico">📋</div><p>記録がありません</p></div>'; return; }
+  var grouped = {}, order = [];
+  recs.forEach(function(r) {
+    var k = new Date(r.mealTime).toDateString();
+    if (!grouped[k]) { grouped[k] = { lbl:fmtD(r.mealTime), items:[] }; order.push(k); }
     grouped[k].items.push(r);
   });
-  var html='';
-  order.forEach(function(k){
-    var day=grouped[k];
-    html+='<div class="day-lbl">'+day.lbl+'</div><div class="card">';
-    day.items.forEach(function(r){html+=recRowHTML(r,true)});
-    html+='</div>';
+  var html = '';
+  order.forEach(function(k) {
+    var day = grouped[k];
+    html += '<div class="day-lbl">' + day.lbl + '</div><div class="card">';
+    day.items.forEach(function(r) { html += recRowHTML(r); });
+    html += '</div>';
   });
-  $('histS').innerHTML=html;
+  $('histS').innerHTML = html;
 }
 
 // ── Render: Stats ────────────────────────────────────────────────
-function renderStat(){
-  var wg=recs.filter(function(r){return r.glucose});
-  if(!wg.length){$('statS').innerHTML='<div class="empty"><div class="empty-ico">📊</div><p>血糖値を記録するとここに統計が表示されます</p></div>';return}
-  var vals=wg.map(function(r){return r.glucose.val});
-  var avg=Math.round(vals.reduce(function(a,b){return a+b},0)/vals.length);
-  var mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals);
-  var post=wg.filter(function(r){return r.type!=='fasting'});
-  var pct=post.length?Math.round(post.filter(function(r){return r.glucose.val<140}).length/post.length*100):null;
-  var avgCol=avg<140?'var(--green)':avg<200?'var(--amber)':'var(--red)';
-  var html='<div class="card"><div class="card-lbl">サマリー — '+wg.length+' 件記録</div><div class="stat-grid">';
-  html+='<div class="stat-box"><div class="stat-num" style="color:'+avgCol+'">'+avg+'</div><div class="stat-lbl">平均 mg/dL</div></div>';
-  if(pct!==null) html+='<div class="stat-box"><div class="stat-num" style="color:var(--green)">'+pct+'%</div><div class="stat-lbl">食後達成率</div></div>';
-  html+='<div class="stat-box"><div class="stat-num" style="color:var(--red)">'+mx+'</div><div class="stat-lbl">最高 mg/dL</div></div>';
-  html+='<div class="stat-box"><div class="stat-num" style="color:var(--blue)">'+mn+'</div><div class="stat-lbl">最低 mg/dL</div></div>';
-  html+='</div></div>';
-  var recent=wg.slice(0,10).reverse();
-  if(recent.length>=2){
-    var maxV=Math.max.apply(null,recent.map(function(r){return r.glucose.val}));
-    html+='<div class="card"><div class="card-lbl">直近の推移</div><div class="mini-bars">';
-    recent.forEach(function(r){
-      var pct2=Math.round((r.glucose.val/(maxV*1.12))*100);
-      var col={green:'var(--green)',amber:'var(--amber)',red:'var(--red)'}[r.glucose.level]||'var(--ink4)';
-      html+='<div class="bar-col"><div class="bar-num" style="color:'+col+'">'+r.glucose.val+'</div><div class="bar-seg" style="height:'+pct2+'%;background:'+col+';opacity:.55"></div><div class="bar-txt">'+(r.mealType||'空腹').slice(0,2)+'</div></div>';
+function renderStat() {
+  var wg = recs.filter(function(r) { return r.glucose; });
+  if (!wg.length) { $('statS').innerHTML = '<div class="empty"><div class="empty-ico">📊</div><p>血糖値を記録するとここに統計が表示されます</p></div>'; return; }
+  var vals = wg.map(function(r) { return r.glucose.val; });
+  var avg = Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
+  var mx = Math.max.apply(null,vals), mn = Math.min.apply(null,vals);
+  var post = wg.filter(function(r) { return r.type !== 'fasting'; });
+  var pct = post.length ? Math.round(post.filter(function(r){return r.glucose.val<140;}).length/post.length*100) : null;
+  var avgCol = avg<140?'var(--green)':avg<200?'var(--amber)':'var(--red)';
+  var html = '<div class="card"><div class="card-lbl">サマリー — '+wg.length+' 件記録</div><div class="stat-grid">';
+  html += '<div class="stat-box"><div class="stat-num" style="color:'+avgCol+'">'+avg+'</div><div class="stat-lbl">平均 mg/dL</div></div>';
+  if (pct !== null) html += '<div class="stat-box"><div class="stat-num" style="color:var(--green)">'+pct+'%</div><div class="stat-lbl">食後達成率</div></div>';
+  html += '<div class="stat-box"><div class="stat-num" style="color:var(--red)">'+mx+'</div><div class="stat-lbl">最高 mg/dL</div></div>';
+  html += '<div class="stat-box"><div class="stat-num" style="color:var(--blue)">'+mn+'</div><div class="stat-lbl">最低 mg/dL</div></div>';
+  html += '</div></div>';
+  var recent = wg.slice(0,10).reverse();
+  if (recent.length >= 2) {
+    var maxV = Math.max.apply(null, recent.map(function(r){return r.glucose.val;}));
+    html += '<div class="card"><div class="card-lbl">直近の推移</div><div class="mini-bars">';
+    recent.forEach(function(r) {
+      var pct2 = Math.round((r.glucose.val/(maxV*1.12))*100);
+      var col = COLS[r.glucose.level]||'var(--ink4)';
+      html += '<div class="bar-col"><div class="bar-num" style="color:'+col+'">'+r.glucose.val+'</div><div class="bar-seg" style="height:'+pct2+'%;background:'+col+';opacity:.55"></div><div class="bar-txt">'+(r.mealType||'空腹').slice(0,2)+'</div></div>';
     });
-    html+='</div><div style="font-size:11px;color:var(--ink4);text-align:center;margin-top:2px">食後目標：140 mg/dL 未満</div></div>';
+    html += '</div><div style="font-size:11px;color:var(--ink4);text-align:center;margin-top:2px">食後目標：140 mg/dL 未満</div></div>';
   }
-  var byType={};
-  post.forEach(function(r){var mt=r.mealType||'その他';if(!byType[mt])byType[mt]=[];byType[mt].push(r.glucose.val)});
-  var tks=Object.keys(byType);
-  if(tks.length){
-    html+='<div class="card"><div class="card-lbl">食事別平均</div>';
-    tks.forEach(function(mt){
-      var a2=Math.round(byType[mt].reduce(function(a,b){return a+b},0)/byType[mt].length);
-      var col=a2<140?'var(--green)':a2<200?'var(--amber)':'var(--red)';
-      html+='<div class="rec-row"><div class="rec-info"><div class="rec-name">'+mt+'</div><div class="rec-meta">'+byType[mt].length+' 件</div></div><div class="rec-val"><div class="rec-num" style="color:'+col+'">'+a2+'</div><div class="rec-unit">mg/dL</div></div></div>';
+  var byType = {};
+  post.forEach(function(r) { var mt=r.mealType||'その他'; if(!byType[mt]) byType[mt]=[]; byType[mt].push(r.glucose.val); });
+  var tks = Object.keys(byType);
+  if (tks.length) {
+    html += '<div class="card"><div class="card-lbl">食事別平均</div>';
+    tks.forEach(function(mt) {
+      var a2 = Math.round(byType[mt].reduce(function(a,b){return a+b;},0)/byType[mt].length);
+      var col = a2<140?'var(--green)':a2<200?'var(--amber)':'var(--red)';
+      html += '<div class="rec-row"><div class="rec-info"><div class="rec-name">'+mt+'</div><div class="rec-meta">'+byType[mt].length+' 件</div></div><div class="rec-val"><div class="rec-num" style="color:'+col+'">'+a2+'</div><div class="rec-unit">mg/dL</div></div></div>';
     });
-    html+='</div>';
+    html += '</div>';
   }
-  $('statS').innerHTML=html;
+  $('statS').innerHTML = html;
+}
+
+// ── Restore alarms after page load ────────────────────────────────
+function restoreAlarms() {
+  var saved = loadAlms();
+  if (!saved || !saved.length) return;
+  saved.forEach(function(a) {
+    var rec = byId(a.recId);
+    if (!rec || rec.cancelled || rec.glucose) return; // skip if resolved
+    a.remindAt = +a.remindAt;
+    alarms.push(a);
+    if (a.remindAt <= Date.now()) {
+      // Overdue — fire immediately
+      setTimeout(function() { fireRemind(a.recId); }, 100);
+    } else {
+      startTimer(a, rec);
+    }
+  });
+  saveAlms();
+  renderAlarmCards();
 }
 
 // ── Boot ─────────────────────────────────────────────────────────
-load();initHeader();checkBanner();renderToday();restoreAlarm();
-if('serviceWorker'in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
-document.querySelectorAll('.overlay').forEach(function(el){
-  el.addEventListener('click',function(e){if(e.target===el)closeSheet(el.id)});
+load();
+initHeader();
+checkBanner();
+renderToday();
+restoreAlarms();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+document.querySelectorAll('.overlay').forEach(function(el) {
+  el.addEventListener('click', function(e) { if (e.target === el) closeSheet(el.id); });
 });
 </script>
 </body>
